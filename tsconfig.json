@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": "src",
+        "jsx": "preserve",
+    },
+    //"include": ["*/.js", "*/.ts", "*/.tsx"]
+}
