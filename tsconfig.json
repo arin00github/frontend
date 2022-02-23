@@ -1,9 +1,28 @@
 {
     "compilerOptions": {
+        "target": "es6",
+        "strict": false,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
-        "baseUrl": "src",
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,        
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+        "baseUrl": ".",
+        "paths": {
+            "Components/*": ["src/components/*"],
+            "Interface/*":["src/service/interface/*"],
+            "Pages/*":["src/pages/*"],
+            "Layout/*":["src/layout/*"],
+            
+        },
         "jsx": "preserve",
     },
+    "include": ["src"]
     //"include": ["*/.js", "*/.ts", "*/.tsx"]
 }
