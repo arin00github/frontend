@@ -7,7 +7,7 @@ export default function ListPage() {
   const subNav: { title: string; url: string }[] = [
     { title: "example01", url: "example01" },
     { title: "example02", url: "example02" },
-    { title: "Clustered Featured", url: "example03" },
+    { title: "example03", url: "example03" },
   ];
 
   const renderNav = () => {

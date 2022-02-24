@@ -15,6 +15,7 @@ export function Aside() {
     { title: "menu02", url: "/menu02", index: 2 },
     { title: "menu03", url: "/menu03", index: 3 },
     { title: "menu04", url: "/menu04", index: 4 },
+    { title: "menu05", url: "/menu05", index: 5 },
   ];
 
   const renderMenu = () => {
