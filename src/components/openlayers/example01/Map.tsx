@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createContext } from "react";
 import { ReactNode, useEffect, useState } from "react";
 import { Map as OlMap, View } from "ol";
 import { defaults as defaultContorls } from "ol/control";
@@ -7,14 +7,15 @@ import { OSM } from "ol/source";
 import { Tile as TileLayer } from "ol/layer";
 import { fromLonLat, get as getProjection } from "ol/proj";
 import MapContext from "./MapContext";
-import { Map as MapObject } from "openlayers";
 
 type MapProps = {
   children: ReactNode;
 };
 
 const Map = ({ children }: MapProps) => {
-  const [mapObj, setMapObj] = useState<any>({});
+  const [mapObj, setMapObj] = useState<{ map: OlMap }>({ map: null });
+
+  //const MapContext = createContext<{ map: OlMap }>({ map: null });
 
   useEffect(() => {
     const map = new OlMap({

@@ -39,7 +39,8 @@ export function MyTable<T extends object>({
     useRowSelect
   );
 
-  const { headerGroups, headers, state, getTableProps, page } = instance;
+  const { headerGroups, headers, state, getTableProps, page, gotoPage } =
+    instance;
 
   const renderThead = () => {
     return (

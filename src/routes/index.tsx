@@ -16,7 +16,7 @@ export default function AppRoutes() {
           <Route path="/" element={<IndexHome />} />
           <Route path="menu01" element={<IndexMenu01 />} />
           <Route path="menu02" element={<IndexMenu02 />} />
-          <Route path="menu03" element={<IndexMenu03 />} />
+          <Route path="menu03/*" element={<IndexMenu03 />} />
           <Route path="menu04" element={<IndexMenu04 />} />
           <Route path="*" element={<NotFound />} />
         </Route>
