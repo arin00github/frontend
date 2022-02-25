@@ -1,13 +1,24 @@
 import path from "path";
-import { Configuration, HotModuleReplacementPlugin } from "webpack";
+import {
+  Compiler,
+  Configuration,
+  HotModuleReplacementPlugin,
+  WebpackPluginInstance,
+} from "webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import CopyWebpackPlugin from "copy-webpack-plugin";
 import EslintPlugin from "eslint-webpack-plugin";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
-
+import DotenvWebpackPlugin from "dotenv-webpack";
 interface devConfiguration extends Configuration {
   devServer?: WebpackDevServerConfiguration;
+  plugins: (
+    | ((this: Compiler, compiler: Compiler) => void)
+    | WebpackPluginInstance
+    | DotenvWebpackPlugin
+    | any
+  )[];
 }
 
 const config: devConfiguration = {
@@ -72,6 +83,9 @@ const config: devConfiguration = {
     }),
     new EslintPlugin({
       extensions: ["js", "jsx", "ts", "tsx"],
+    }),
+    new DotenvWebpackPlugin({
+      path: "./env.development",
     }),
     // new CopyWebpackPlugin({
     //   patterns: [{ from: "src/assets", to: "assets" }],
