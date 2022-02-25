@@ -1,38 +1,50 @@
 import React from "react";
-import { Box, Text } from "@chakra-ui/react";
-import { PageHeader } from "../../layout/PageHeader";
-import { PageBody } from "../../layout/PageBody";
-import dataCollection from "../../service/data/data.json";
-import { MyTable } from "../../components/table/MyTable";
+import { Box, Button, HStack, Text } from "@chakra-ui/react";
+import { PageHeader } from "Layout/PageHeader";
+import { PageBody } from "Layout/PageBody";
+
 import { Column } from "react-table";
 import { useMemo } from "react";
-import { IDateType01 } from "../../service/interface/dataType01";
+import { IDateType01, IDateType02 } from "../../service/interface/dataType01";
+import Example01 from "Pages/menu01/example01";
+import Example02 from "Pages/menu01/example02";
+import Example03 from "Pages/menu01/example03";
+import { Route, Routes } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function IndexMenu01() {
-  console.log(dataCollection);
+  //console.log(dataCollection);
 
-  const columnArray1: Column<IDateType01>[] = useMemo(
-    () => [
-      {
-        Header: "아이디",
-        accessor: "id",
-      },
-      {
-        Header: "이름",
-        accessor: "last_name",
-      },
-      { Header: "도시", accessor: "city" },
-    ],
-    []
-  );
+  const subNavList = [
+    { title: "table01", url: "table01" },
+    { title: "table02", url: "table02" },
+    { title: "table03", url: "table03" },
+  ];
+
+  const renderNav = () => {
+    return (
+      <HStack>
+        {subNavList.map((nav, idx) => (
+          <Button key={`subnav${idx}`}>
+            <Link to={nav.url}>{nav.title}</Link>
+          </Button>
+        ))}
+      </HStack>
+    );
+  };
 
   return (
     <>
       <PageHeader>React Table</PageHeader>
       <PageBody>
-        <Text>react table 사용법</Text>
-        {/* <MyTable data={dataCollection} columns={columnArray1} /> */}
+        <Box mb={5}>{renderNav()}</Box>
       </PageBody>
+      <Routes>
+        <Route path="/" element={<Example01 />} />
+        <Route path="table01" element={<Example01 />}></Route>
+        <Route path="table02" element={<Example02 />}></Route>
+        <Route path="table03" element={<Example03 />}></Route>
+      </Routes>
     </>
   );
 }

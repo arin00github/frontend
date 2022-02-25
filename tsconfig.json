@@ -20,7 +20,8 @@
             "Interface/*":["src/service/interface/*"],
             "Pages/*":["src/pages/*"],
             "Layout/*":["src/layout/*"],
-            
+            "Assets/*": ["src/assets/*"],
+            "Redux/*":["src/redux/*"],
         },
         "jsx": "preserve",
     },

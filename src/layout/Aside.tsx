@@ -11,7 +11,7 @@ interface ImenuArray {
 export function Aside() {
   const menuArray: ImenuArray[] = [
     { title: "home", url: "/", index: 0 },
-    { title: "menu01", url: "/menu01", index: 1 },
+    { title: "menu01", url: "/menu01/table01", index: 1 },
     { title: "menu02", url: "/menu02", index: 2 },
     { title: "menu03", url: "/menu03", index: 3 },
     { title: "menu04", url: "/menu04", index: 4 },

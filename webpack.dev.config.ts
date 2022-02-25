@@ -51,10 +51,11 @@ const config: devConfiguration = {
       Api: path.resolve(__dirname, "./src/service/api/"),
       Interface: path.resolve(__dirname, "./src/service/interface/"),
       Utils: path.resolve(__dirname, "./src/service/utils/"),
-      Redux: path.resolve(__dirname, "./src/redux/"),
+      Assets: path.resolve(__dirname, "./src/assets/"),
       Pages: path.resolve(__dirname, "./src/pages/"),
       Data: path.resolve(__dirname, "./src/service/data/"),
       Layout: path.resolve(__dirname, "./src/layout/"),
+      Redux: path.resolve(__dirname, "./src/redux/"),
     },
     fallback: {
       buffer: require.resolve("buffer"),
@@ -81,7 +82,7 @@ const config: devConfiguration = {
     // static: path.join(__dirname, "build"),
 
     historyApiFallback: true, //에러방지 react-router cannot GET {url}
-    port: 3000,
+    port: 3800,
     open: true,
     // hot: true,
     // proxy: {

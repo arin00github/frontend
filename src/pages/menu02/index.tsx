@@ -6,9 +6,9 @@ import { PageBody } from "Layout/PageBody";
 export default function IndexMenu02() {
   return (
     <>
-      <PageHeader>AutoComplete</PageHeader>
+      <PageHeader>Context API</PageHeader>
       <PageBody>
-        <Text>autocomplete 만들기</Text>
+        <Text>context API 기능 공부하기</Text>
       </PageBody>
     </>
   );
