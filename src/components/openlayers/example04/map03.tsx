@@ -62,7 +62,7 @@ export function MapBox3({ children }: any) {
         }),
       ]),
       layers: layers,
-      target: "map4",
+      target: "map_projection_03",
       view: new View({
         projection: projection,
         center: transform([8.23, 46.86], "EPSG:4326", "EPSG:21781"),

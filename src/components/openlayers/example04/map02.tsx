@@ -57,7 +57,7 @@ export function MapBox2({ children }: any) {
 
     const map = new Map({
       layers: [vectorLayer],
-      target: "map2",
+      target: "map_projection_02",
       view: new View({
         center: fromLonLat([-100, 38.5]),
         zoom: 4,
