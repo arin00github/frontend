@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Map from "ol/Map";
 import View from "ol/View";
 import "ol/ol.css";
@@ -8,7 +8,7 @@ import OSM from "ol/source/OSM";
 
 import { useEffect } from "react";
 import { useState } from "react";
-import MapContext from "./MapContext01";
+import { MapContext01 } from "./MapContext01";
 import { ScaleLine, defaults as defaultControls } from "ol/control";
 
 export const MapProvider01 = ({ children }: any) => {
@@ -17,6 +17,22 @@ export const MapProvider01 = ({ children }: any) => {
 
   //const viewProjSelect: any = document.getElementById("view-projection");
   //const projection = getProjection(viewProjSelect.value);
+
+  const handleMap01 = (map: Map) => {
+    setMapObj(map);
+  };
+  const handleProjection = (map: string) => {
+    setProjOption(map);
+  };
+
+  const value = useMemo(() => {
+    return {
+      map1: mapObj,
+      setMap1: handleMap01,
+      projValue: projOption,
+      setProjValue: handleProjection,
+    };
+  }, [projOption]);
 
   useEffect(() => {
     console.log("provider", projOption);
@@ -46,8 +62,6 @@ export const MapProvider01 = ({ children }: any) => {
       });
 
       setMapObj(map);
-    } else {
-      setProjOption("EPSG:3857");
     }
 
     return () => {
@@ -56,15 +70,6 @@ export const MapProvider01 = ({ children }: any) => {
   }, []);
 
   return (
-    <MapContext.Provider
-      value={{
-        map1: mapObj,
-        setMap1: setMapObj,
-        projValue: projOption,
-        setProjValue: setProjOption,
-      }}
-    >
-      {children}
-    </MapContext.Provider>
+    <MapContext01.Provider value={value}>{children}</MapContext01.Provider>
   );
 };

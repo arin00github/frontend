@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { getPointResolution, get as getProjection, transform } from "ol/proj";
 import { Box, Input, Select } from "@chakra-ui/react";
-import MapContext01 from "./MapContext01";
+import { MapContext01 } from "./MapContext01";
 import { View } from "ol";
 
 export const Map01 = () => {
@@ -58,18 +58,6 @@ export const Map01 = () => {
 
     // map1.setView(newView);
   }
-
-  //   useEffect(() => {
-  //     if (map1 !== null && map1 !== undefined) {
-  //       const projection = getProjection(selecRef.current.value)
-  //       map1.getView().
-
-  //     }
-  //   }, [map1]);
-
-  useEffect(() => {
-    console.log("projValue", projValue, value);
-  }, [value]);
 
   useEffect(() => {
     if (map1 !== null && map1 !== undefined) {

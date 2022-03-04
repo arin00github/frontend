@@ -15,10 +15,10 @@ import {
 import { useContext } from "react";
 import { Map } from "ol";
 import MapContext3 from "Components/openlayers/example04/MapContext03";
-import MapContext1 from "Components/openlayers/example04/MapContext01";
+import { MapContext01 } from "Components/openlayers/example04/MapContext01";
 
 export default function Example04() {
-  const { map1 } = useContext<{ map1: Map }>(MapContext1);
+  const { map1 } = useContext<{ map1: Map }>(MapContext01);
   const { map3 } = useContext<{ map3: Map }>(MapContext3);
   const [tabIndex, setTabIndex] = useState<number>(0);
 

@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { Box } from "@chakra-ui/react";
 import { MapProvider01 } from "./MapProvider01";
 import { Map01 } from "./Map01";
-import MapContext01 from "./MapContext01";
+import { MapContext01 } from "./MapContext01";
 import RenderFeature from "ol/render/Feature";
 
 export const MapBox01 = () => {
