@@ -12,6 +12,7 @@ import { PageHeader } from "Layout/PageHeader";
 import { PageBody } from "Layout/PageBody";
 import { App } from "Components/velopert/react/App";
 import TodoApp from "Components/velopert/todoList/TodoApp";
+import CounterContainer from "Components/velopert/saga/CounterContainer";
 
 export default function IndexMenu02() {
   return (
@@ -31,7 +32,9 @@ export default function IndexMenu02() {
             <TabPanel p={0}>
               <App />
             </TabPanel>
-            <TabPanel p={0}>tab03</TabPanel>
+            <TabPanel p={0}>
+              <CounterContainer />
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </PageBody>

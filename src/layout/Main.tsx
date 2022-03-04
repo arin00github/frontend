@@ -8,7 +8,10 @@ export default function Main() {
   const router = useLocation();
 
   const renderMain = () => {
-    if (router.pathname.includes("menu03")) {
+    if (
+      router.pathname.includes("menu03") ||
+      router.pathname.includes("menu04")
+    ) {
       return (
         <Container maxW="100%">
           <Outlet />
