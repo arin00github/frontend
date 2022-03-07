@@ -1,26 +1,19 @@
 import React, { createContext, useContext, useMemo, useReducer } from "react";
 import Map from "ol/Map";
-import View from "ol/View";
-import "ol/ol.css";
-import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
-import { getPointResolution, get as getProjection, transform } from "ol/proj";
-import OSM from "ol/source/OSM";
 
-import { useEffect } from "react";
-import { useState } from "react";
-import { MapContext01 } from "./MapContext01";
-import { ScaleLine, defaults as defaultControls } from "ol/control";
+import "ol/ol.css";
 
 interface IValue {
   map: Map;
   value: string;
 }
-
+// 초기값정의
 const initialValue: IValue = {
   map: null,
   value: "EPSG:3857",
 };
 
+// 리듀서 정의
 function mapReducer(state: any, action: any) {
   switch (action.type) {
     case "CHANGE_INPUT":
@@ -33,9 +26,12 @@ function mapReducer(state: any, action: any) {
       throw new Error(`Unhandled action type ${action.type}`);
   }
 }
+
+//Context 생성
 const mapStateContext = createContext<IValue>(null);
 const mapDispatchContext = createContext(null);
 
+//Provider 컴포넌트 제작 및 useReducer 사용
 export const MapProvider01 = ({ children }: any) => {
   const [state, dispatch] = useReducer(mapReducer, initialValue);
 
@@ -50,6 +46,7 @@ export const MapProvider01 = ({ children }: any) => {
   );
 };
 
+// useContext 불러오고 다시 context 리턴
 export function useMapState() {
   const context = useContext(mapStateContext);
   if (!context) {

@@ -15,7 +15,6 @@ import {
 import { useContext } from "react";
 import { Map } from "ol";
 import MapContext3 from "Components/openlayers/example04/MapContext03";
-import { MapContext01 } from "Components/openlayers/example04/MapContext01";
 
 export default function Example04() {
   //const { map1 } = useContext<{ map1: Map }>(MapContext01);

@@ -1,11 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { getPointResolution, get as getProjection, transform } from "ol/proj";
 import { Box, Input, Select } from "@chakra-ui/react";
-import { MapContext01 } from "./MapContext01";
 import { useMapDispatch, useMapState } from "./MapProvider01";
 import Map from "ol/Map";
 import { View } from "ol";
-import { ScaleLine } from "ol/control";
 import { OSM } from "ol/source";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
 import "ol/ol.css";
