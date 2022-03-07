@@ -69,19 +69,17 @@ export const Map01 = () => {
   const toggleLayer = (e: any) => {
     e.preventDefault();
 
-    // naver.maps.Event.addListener(
-    //   map,
-    //   "cadastralLayer_changed",
-    //   function (layer) {
-    //     console.log("layer", layer);
-    //   }
-    // );
-
     if (newLayer.getMap()) {
       newLayer.setMap(null);
     } else {
       newLayer.setMap(map);
     }
+  };
+
+  const pointerClick = () => {
+    naver.maps.Event.addListener(map, "click", function (e) {
+      marker.setPosition(e.latlng);
+    });
   };
 
   useEffect(() => {
@@ -93,14 +91,19 @@ export const Map01 = () => {
       console.log("useEffect");
       initMarker();
       addLayer();
+      pointerClick();
     }
+    return () => {
+      //
+    };
   }, [map]);
 
   return (
     <Box
       id="naver_map"
-      w="100%"
+      //w="100%"
       h="560px"
+      w="1200px"
       //  onClick={() => eventListner()}
     >
       <Button onClick={toggleLayer} zIndex={1000}>
