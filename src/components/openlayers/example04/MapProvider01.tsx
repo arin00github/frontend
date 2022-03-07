@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { createContext, useContext, useMemo, useReducer } from "react";
 import Map from "ol/Map";
 import View from "ol/View";
 import "ol/ol.css";
@@ -11,65 +11,58 @@ import { useState } from "react";
 import { MapContext01 } from "./MapContext01";
 import { ScaleLine, defaults as defaultControls } from "ol/control";
 
+interface IValue {
+  map: Map;
+  value: string;
+}
+
+const initialValue: IValue = {
+  map: null,
+  value: "EPSG:3857",
+};
+
+function mapReducer(state: any, action: any) {
+  switch (action.type) {
+    case "CHANGE_INPUT":
+      console.log("action", action);
+      return { ...state, value: action.value };
+    case "CHANGE_MAP":
+      console.log("map action", action);
+      return { ...state, map: action.map };
+    default:
+      throw new Error(`Unhandled action type ${action.type}`);
+  }
+}
+const mapStateContext = createContext<IValue>(null);
+const mapDispatchContext = createContext(null);
+
 export const MapProvider01 = ({ children }: any) => {
-  const [projOption, setProjOption] = useState<string>("EPSG:3857");
-  const [mapObj, setMapObj] = useState<Map>(null);
+  const [state, dispatch] = useReducer(mapReducer, initialValue);
 
-  //const viewProjSelect: any = document.getElementById("view-projection");
-  //const projection = getProjection(viewProjSelect.value);
-
-  const handleMap01 = (map: Map) => {
-    setMapObj(map);
-  };
-  const handleProjection = (map: string) => {
-    setProjOption(map);
-  };
-
-  const value = useMemo(() => {
-    return {
-      map1: mapObj,
-      setMap1: handleMap01,
-      projValue: projOption,
-      setProjValue: handleProjection,
-    };
-  }, [projOption]);
-
-  useEffect(() => {
-    console.log("provider", projOption);
-    if (projOption !== undefined && projOption !== null) {
-      const projection = projOption;
-
-      const scaleControl = new ScaleLine({
-        units: "metric",
-        bar: true,
-        steps: 4,
-        text: true,
-        minWidth: 140,
-      });
-
-      const map = new Map({
-        layers: [
-          new TileLayer({
-            source: new OSM(),
-          }),
-        ],
-        target: "map_projection_01",
-        view: new View({
-          center: transform([0, 52], "EPSG:4326", projection),
-          zoom: 6,
-          projection: projection,
-        }),
-      });
-
-      setMapObj(map);
-    }
-
-    return () => {
-      return null;
-    };
-  }, []);
+  console.log("state", state);
 
   return (
-    <MapContext01.Provider value={value}>{children}</MapContext01.Provider>
+    <mapStateContext.Provider value={state}>
+      <mapDispatchContext.Provider value={dispatch}>
+        {children}
+      </mapDispatchContext.Provider>
+    </mapStateContext.Provider>
   );
 };
+
+export function useMapState() {
+  const context = useContext(mapStateContext);
+  if (!context) {
+    throw new Error("Cannot find TodoProvider");
+  }
+  return context;
+}
+
+export function useMapDispatch() {
+  const context = useContext(mapDispatchContext);
+  //console.log("context", context);
+  if (!context) {
+    throw new Error("Cannot find TodoProvider");
+  }
+  return context;
+}

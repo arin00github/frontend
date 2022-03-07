@@ -18,7 +18,7 @@ import MapContext3 from "Components/openlayers/example04/MapContext03";
 import { MapContext01 } from "Components/openlayers/example04/MapContext01";
 
 export default function Example04() {
-  const { map1 } = useContext<{ map1: Map }>(MapContext01);
+  //const { map1 } = useContext<{ map1: Map }>(MapContext01);
   const { map3 } = useContext<{ map3: Map }>(MapContext3);
   const [tabIndex, setTabIndex] = useState<number>(0);
 
@@ -46,9 +46,9 @@ export default function Example04() {
   };
   useEffect(() => {
     if (tabIndex === 0) {
-      console.log("page", map1); /// render가 한발 늦어서 null 값이 나옴 => render함수를 컴포넌트화 시켜야 함
+      //console.log("page", map1); /// render가 한발 늦어서 null 값이 나옴 => render함수를 컴포넌트화 시켜야 함
     }
-  }, [tabIndex, map1]);
+  }, [tabIndex]);
 
   return (
     <div>

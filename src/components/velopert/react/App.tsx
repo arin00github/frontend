@@ -83,7 +83,7 @@ function UserReducer(state: IUserList, action: any) {
 export const UserDispatch = createContext(null);
 
 export function App() {
-  const [form, onChange, reset] = useInputs({
+  const { form, onChange, reset } = useInputs({
     username: "",
     email: "",
   });

@@ -5,9 +5,7 @@ export type UserInputsProps = {
   email: string;
 };
 
-export function useInputs(
-  initialForm: UserInputsProps
-): (UserInputsProps | ((e: any) => void))[] {
+export function useInputs(initialForm: UserInputsProps) {
   const [form, setForm] = useState<UserInputsProps>(initialForm);
 
   const onChange = useCallback((e) => {
@@ -19,7 +17,7 @@ export function useInputs(
     setForm(initialForm);
   }, [initialForm]);
 
-  const value = [form, onChange, reset];
+  const value = { form, onChange, reset };
 
   return value;
 }
