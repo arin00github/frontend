@@ -47,13 +47,13 @@ const config: devConfiguration = {
         test: /\.(sa|sc|c)ss$/,
         use: ["style-loader", "css-loader"],
       },
-      // {
-      //   test: /\.(jpe?g|png|gif|svg)$/i,
-      //   loader: "file-loader",
-      //   options: {
-      //     name: "assets/images/[name].[ext]",
-      //   },
-      // },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loader: "file-loader",
+        options: {
+          name: "assets/images/[name].[ext]",
+        },
+      },
     ],
   },
   resolve: {
@@ -87,9 +87,9 @@ const config: devConfiguration = {
     new DotenvWebpackPlugin({
       path: "./env.development",
     }),
-    // new CopyWebpackPlugin({
-    //   patterns: [{ from: "src/assets", to: "assets" }],
-    // }),
+    new CopyWebpackPlugin({
+      patterns: [{ from: "src/assets", to: "assets" }],
+    }),
   ],
   devtool: "inline-source-map",
   devServer: {

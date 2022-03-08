@@ -27,21 +27,9 @@ export const Map01 = () => {
       mapTypeControlOptions: {
         style: naver.maps.MapTypeControlStyle.DROPDOWN,
       },
-      //   scaleControl: true,
-      //   zoomControl: true,
-      //   zoomControlOptions: {
-      //     style: naver.maps.ZoomControlStyle.LARGE,
-      //   },
-      //   mapDataControl: true,
     });
     mapElement = mapObject.getElement();
     dispatch({ type: "CHANGE_MAP", map: mapObject });
-  };
-
-  const addLayer = () => {
-    naver.maps.Event.once(map, "init", function () {
-      newLayer.setMap(map);
-    });
   };
 
   const initMarker = () => {
@@ -66,20 +54,57 @@ export const Map01 = () => {
     });
   };
 
-  const toggleLayer = (e: any) => {
-    e.preventDefault();
+  // const addLayer = () => {
+  //   naver.maps.Event.once(map, "init", function () {
+  //     newLayer.setMap(map);
+  //   });
+  // };
 
-    if (newLayer.getMap()) {
-      newLayer.setMap(null);
-    } else {
-      newLayer.setMap(map);
-    }
+  // const toggleLayer = (e: any) => {
+  //   e.preventDefault();
+
+  //   if (newLayer.getMap()) {
+  //     newLayer.setMap(null);
+  //   } else {
+  //     newLayer.setMap(map);
+  //   }
+  // };
+
+  // const pointerClick = () => {
+  //   naver.maps.Event.addListener(map, "click", function (e) {
+  //     marker.setPosition(e.latlng);
+  //   });
+  // };
+
+  const myMapType: naver.maps.MapType = {
+    name: "Alphabet",
+    minZoom: 0,
+    maxZoom: 22,
+    projection: null,
+    tileSize: new naver.maps.Size(50, 50),
+    getTile: function (x, y, z) {
+      const w: number = this.tileSize.width;
+      const h: number = this.tileSize.heigth;
+
+      const putNum = Math.abs(x + y) % 26;
+      const ascii = putNum + 65;
+      const alphabet = String.fromCharCode(ascii);
+      const divBox = document.createElement("div");
+      divBox.classList.add("mytitle");
+      divBox.innerText = alphabet;
+
+      divBox.style.width = `${w}px`;
+      divBox.style.height = `${h}px`;
+      divBox.style.lineHeight = `${h}px`;
+      divBox.style.fontSize = `${Math.min(w, h) - 10}px`;
+      divBox.style.opacity = `${1 - (ascii - 65) * 0.04}`;
+
+      return divBox;
+    },
   };
 
-  const pointerClick = () => {
-    naver.maps.Event.addListener(map, "click", function (e) {
-      marker.setPosition(e.latlng);
-    });
+  const registerMapType = () => {
+    map.mapTypes.set("mine", myMapType);
   };
 
   useEffect(() => {
@@ -90,8 +115,9 @@ export const Map01 = () => {
     if (map !== null) {
       console.log("useEffect");
       initMarker();
-      addLayer();
-      pointerClick();
+      registerMapType();
+      //addLayer();
+      //pointerClick();
     }
     return () => {
       //
@@ -106,9 +132,9 @@ export const Map01 = () => {
       w="1200px"
       //  onClick={() => eventListner()}
     >
-      <Button onClick={toggleLayer} zIndex={1000}>
+      {/* <Button onClick={toggleLayer} zIndex={1000}>
         {showLayer ? "지적도 끄기" : "지적도 켜기"}
-      </Button>
+      </Button> */}
     </Box>
   );
 };

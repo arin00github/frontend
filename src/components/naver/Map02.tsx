@@ -12,7 +12,7 @@ export const Map02 = () => {
   const dispatch = useMapDispatch();
 
   //let HOME_PATH = window.HOME_PATH || '.';
-  const MARKER_ICON_URL = "./img/marker.png";
+  const MARKER_ICON_URL = "/img/marker.png";
   const MARKER_SPRITE_X_OFFSET = 29,
     MARKER_SPRITE_Y_OFFSET = 50;
   const MARKER_SPRITE_POSITION: any = {
@@ -49,6 +49,7 @@ export const Map02 = () => {
 
   let mapObject: MapProps;
   const markers: any[] = [];
+  const infoWindows: any[] = [];
   const initMap = () => {
     mapObject = new naver.maps.Map("naver_map02", {
       center: new naver.maps.LatLng(37.3595704, 127.105399),
@@ -85,15 +86,23 @@ export const Map02 = () => {
         position: position,
         title: key,
         icon: {
-          url: MARKER_ICON_URL,
-          size: new naver.maps.Size(24, 37),
+          url: "../../assets/images/marker.png",
+          //size: new naver.maps.Size(24, 37),
           anchor: new naver.maps.Point(12, 37),
-          origin: new naver.maps.Point(originValue[0], originValue[1]),
+          //origin: new naver.maps.Point(originValue[0], originValue[1]),
         },
         zIndex: 100,
       });
 
+      const infoWindow = new naver.maps.InfoWindow({
+        content:
+          '<div style="width:150px;text-align:center;padding:10px;">The Letter is <b>"' +
+          key.substr(0, 1) +
+          '"</b>.</div>',
+      });
+
       markers.push(marker);
+      infoWindows.push(infoWindow);
     }
   };
 
@@ -146,8 +155,28 @@ export const Map02 = () => {
     marker.setMap(null);
   }
 
+  function getClickHandler(seq: number) {
+    return function () {
+      const markerPoint = markers[seq];
+      const infoWindow: naver.maps.InfoWindow = infoWindows[seq];
+
+      if (infoWindow.getMap()) {
+        infoWindow.close();
+      } else {
+        infoWindow.open(map, markerPoint);
+      }
+    };
+  }
+
+  function regitserEvent() {
+    for (let i = 0; i < markers.length; i++) {
+      naver.maps.Event.addListener(markers[i], "click", getClickHandler(i));
+    }
+  }
+
   useEffect(() => {
     initMap();
+    console.log();
   }, []);
 
   useEffect(() => {
@@ -155,8 +184,13 @@ export const Map02 = () => {
       displayData();
       //console.log("markers", markers);
       controlMarker();
+      regitserEvent();
     }
   }, [map]);
 
-  return <Box id="naver_map02" w="1200px" h="560px"></Box>;
+  return (
+    <>
+      <Box id="naver_map02" w="1200px" h="560px"></Box>
+    </>
+  );
 };

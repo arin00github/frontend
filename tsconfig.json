@@ -22,6 +22,7 @@
             "Layout/*":["src/layout/*"],
             "Assets/*": ["src/assets/*"],
             "Redux/*":["src/redux/*"],
+            "Data/*":["src/service/data/*"]
         },
         "jsx": "preserve",
     },
