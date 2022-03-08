@@ -12,10 +12,11 @@ export const Map02 = () => {
   const dispatch = useMapDispatch();
 
   //let HOME_PATH = window.HOME_PATH || '.';
+  const MARKER_ICON_URL = "./img/marker.png";
   const MARKER_SPRITE_X_OFFSET = 29,
     MARKER_SPRITE_Y_OFFSET = 50;
-  const MARKER_SPRITE_POSITION = {
-    A0: [0, 0],
+  const MARKER_SPRITE_POSITION: any = {
+    // A0: [0, 0],
     B0: [MARKER_SPRITE_X_OFFSET, 0],
     C0: [MARKER_SPRITE_X_OFFSET * 2, 0],
     D0: [MARKER_SPRITE_X_OFFSET * 3, 0],
@@ -51,7 +52,7 @@ export const Map02 = () => {
   const initMap = () => {
     mapObject = new naver.maps.Map("naver_map02", {
       center: new naver.maps.LatLng(37.3595704, 127.105399),
-      zoom: 10,
+      zoom: 11,
     });
 
     dispatch({ type: "CHANGE_MAP", map: mapObject });
@@ -60,38 +61,80 @@ export const Map02 = () => {
   //let bounds = mapObject.getBounds();
   //let southWest = bounds
 
-  // const makeArray = () => {
-  //     for (let key in MARKER_SPRITE_POSITION){
-
-  //     }
-  // }
-
-  const displayData = () => {
-    const bounds = map.getBounds();
-    console.log("bounds", bounds.getMax().x, bounds.getMin().x);
+  const makeOrigin = (key: string) => {
+    return [MARKER_SPRITE_POSITION[key][0], MARKER_SPRITE_POSITION[key][1]];
   };
 
-  //   const controlMarker = () => {
-  //     naver.maps.Event.addListener(mapObject, "idle", function () {
-  //       updateMarker(mapObject, markers);
-  //     });
-  //   };
+  const displayData = () => {
+    console.log("map", map);
+    const bounds = map.getBounds();
+    const latSpan = bounds.getMax().x - bounds.getMin().x;
+    const lngSpan = bounds.getMax().y - bounds.getMin().y;
 
-  //   function updateMarker(mapUnit: MapProps, markers: MarkerProps[]) {
-  //     const mapBounds = mapUnit.getBounds();
-  //     let markerUnit, position;
+    for (const key in MARKER_SPRITE_POSITION) {
+      const position = new naver.maps.LatLng(
+        bounds.getMin().y + lngSpan * Math.random(),
+        bounds.getMin().x + latSpan * Math.random()
+      );
 
-  //     for (let i = 0; i < markers.length; i++) {
-  //       markerUnit = markers[i];
-  //       position = markerUnit.getPosition();
+      const originValue = makeOrigin(key);
+      //console.log(originValue);
 
-  //       if (mapBounds.hasPoint(position)) {
-  //         showMarker(mapUnit, markerUnit);
-  //       } else {
-  //         hideMarker(mapUnit, markerUnit);
-  //       }
-  //     }
-  //   }
+      const marker = new naver.maps.Marker({
+        map: map,
+        position: position,
+        title: key,
+        icon: {
+          url: MARKER_ICON_URL,
+          size: new naver.maps.Size(24, 37),
+          anchor: new naver.maps.Point(12, 37),
+          origin: new naver.maps.Point(originValue[0], originValue[1]),
+        },
+        zIndex: 100,
+      });
+
+      markers.push(marker);
+    }
+  };
+
+  const controlMarker = () => {
+    naver.maps.Event.addListener(map, "idle", function () {
+      console.log("update");
+
+      updateMarker(map, markers);
+    });
+  };
+
+  function updateMarker(mapUnit: MapProps, markersArray: MarkerProps[]) {
+    const mapBounds = mapUnit.getBounds();
+
+    // const sw = new naver.maps.LatLng(
+    //   mapBounds.getMin().y,
+    //   mapBounds.getMin().x
+    // );
+    // const ne = new naver.maps.LatLng(
+    //   mapBounds.getMax().y,
+    //   mapBounds.getMax().x
+    // );
+
+    let markerUnit, position;
+
+    for (let i = 0; i < markersArray.length; i++) {
+      markerUnit = markersArray[i];
+      position = markerUnit.getPosition();
+
+      if (mapBounds.hasPoint(position)) {
+        showMarker(mapUnit, markerUnit);
+      } else {
+        hideMarker(mapUnit, markerUnit);
+      }
+    }
+    const filterPoints = markersArray.filter((point) => {
+      const dotPosition = point.getPosition();
+      return mapBounds.hasPoint(dotPosition);
+    });
+    console.log(filterPoints.length);
+  }
 
   function showMarker(mapUnit: MapProps, marker: MarkerProps) {
     if (marker.getMap()) return;
@@ -110,8 +153,10 @@ export const Map02 = () => {
   useEffect(() => {
     if (map !== null) {
       displayData();
+      //console.log("markers", markers);
+      controlMarker();
     }
   }, [map]);
 
-  return <Box id="naver_map02" w="100%" h="560px"></Box>;
+  return <Box id="naver_map02" w="1200px" h="560px"></Box>;
 };
