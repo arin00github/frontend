@@ -13,7 +13,7 @@ export function Map04() {
   let mapObject;
   let miniMap;
   let contentEl: HTMLDivElement;
-  const semaphore = false;
+  let semaphore = false;
   function initMap() {
     mapObject = new naver.maps.Map("naver_map04", {
       zoom: 6,
@@ -35,11 +35,11 @@ export function Map04() {
     contentEl.style.height = "180px";
     contentEl.style.position = "absolute";
     contentEl.style.bottom = "0";
-    contentEl.style.left = "0";
+    contentEl.style.right = "0";
     contentEl.style.background = "#ffffff";
     contentEl.style.zIndex = "100";
     map.getElement().appendChild(contentEl);
-    console.log(map.getElement());
+    //console.log(map.getElement());
 
     const titleEl = document.createElement("h3");
     titleEl.innerText = "Map State";
@@ -73,36 +73,36 @@ export function Map04() {
         logoControl: false,
       });
 
-      const miniMapHtml = '<div class="minimap">NAVER</div>';
+      const miniMapHtml = '<div class="minimap" id="minimap"></div>';
       const locationBtnHtml =
         '<a href="#" class="btn_mylct"><span class="spr_trff spr_ico_mylct">NAVER 그린팩토리</span></a>';
       const customControl = new naver.maps.CustomControl(miniMapHtml, {
-        position: naver.maps.Position.TOP_CENTER,
+        position: naver.maps.Position.TOP_LEFT,
       });
 
       customControl.setMap(map);
-      // const minimapObject = new naver.maps.Map("minimap", {
-      //   //미니 맵 지도를 생성합니다.
-      //   bounds: map.getBounds(),
-      //   scrollWheel: false,
-      //   scaleControl: false,
-      //   mapDataControl: false,
-      //   logoControl: false,
-      // });
+      const minimapObject = new naver.maps.Map("minimap", {
+        //미니 맵 지도를 생성합니다.
+        bounds: map.getBounds(),
+        scrollWheel: false,
+        scaleControl: false,
+        mapDataControl: false,
+        logoControl: false,
+      });
 
-      // naver.maps.Event.addListener(map, "bounds_changed", function (bounds) {
-      //   if (semaphore) return;
+      naver.maps.Event.addListener(map, "bounds_changed", function (bounds) {
+        if (semaphore) return;
 
-      //   minimapObject.fitBounds(bounds);
-      // });
+        minimapObject.fitBounds(bounds);
+      });
 
-      // naver.maps.Event.addListener(minimapObject, "drag", function () {
-      //   semaphore = true;
-      //   map.panTo(minimapObject.getCenter(), {});
-      //   naver.maps.Event.once(map, "idle", function () {
-      //     semaphore = false;
-      //   });
-      // });
+      naver.maps.Event.addListener(minimapObject, "drag", function () {
+        semaphore = true;
+        map.panTo(minimapObject.getCenter(), {});
+        naver.maps.Event.once(map, "idle", function () {
+          semaphore = false;
+        });
+      });
     });
   }
 
@@ -122,9 +122,6 @@ export function Map04() {
   return (
     <>
       <Box w="1400px" h="680px" id="naver_map04" pos="relative">
-        {/* <Box w="240px" h="160px" pos="absolute" top={0} left={0}>
-          naver api
-        </Box> */}
         <div style={{ width: 180, height: 120, background: "white" }}></div>
       </Box>
     </>

@@ -113,7 +113,7 @@ export const Map01 = () => {
 
   useEffect(() => {
     if (map !== null) {
-      console.log("useEffect");
+      // console.log("useEffect");
       initMarker();
       registerMapType();
       //addLayer();

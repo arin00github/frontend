@@ -43,7 +43,7 @@ export function Map03() {
         logoControl: false,
       });
 
-      console.log(map.controls[naver.maps.Position.BOTTOM_RIGHT]);
+      //console.log(map.controls[naver.maps.Position.BOTTOM_RIGHT]);
 
       map.controls[naver.maps.Position.BOTTOM_RIGHT].push(miniBox);
       map.setOptions({

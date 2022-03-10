@@ -67,7 +67,7 @@ export const Map02 = () => {
   };
 
   const displayData = () => {
-    console.log("map", map);
+    //console.log("map", map);
     const bounds = map.getBounds();
     const latSpan = bounds.getMax().x - bounds.getMin().x;
     const lngSpan = bounds.getMax().y - bounds.getMin().y;
@@ -108,7 +108,7 @@ export const Map02 = () => {
 
   const controlMarker = () => {
     naver.maps.Event.addListener(map, "idle", function () {
-      console.log("update");
+      //console.log("update");
 
       updateMarker(map, markers);
     });
@@ -142,7 +142,7 @@ export const Map02 = () => {
       const dotPosition = point.getPosition();
       return mapBounds.hasPoint(dotPosition);
     });
-    console.log(filterPoints.length);
+    //console.log(filterPoints.length);
   }
 
   function showMarker(mapUnit: MapProps, marker: MarkerProps) {
