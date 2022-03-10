@@ -3,9 +3,13 @@ import { Box } from "@chakra-ui/react";
 import { useMapDispatch05, useMapState05 } from "./MapProvider05";
 import regionData from "Data/map.json";
 
-export function Map05() {
+interface IMap05 {
+  handleSelect: (code: string, center?: any) => void;
+}
+
+export function Map05({ handleSelect }: IMap05) {
   const [dataList, setDataList] = useState(null);
-  const [regionList, setRegionList] = useState(null);
+  const [selectedReg, setSelectedReg] = useState<string>(undefined);
 
   const { map } = useMapState05();
 
@@ -16,7 +20,7 @@ export function Map05() {
 
   function initMap() {
     mapObject = new naver.maps.Map("naver_map05", {
-      zoom: 6,
+      zoom: 7,
       center: new naver.maps.LatLng(36.2253017, 127.6460516),
       zoomControl: true,
       zoomControlOptions: {
@@ -52,19 +56,36 @@ export function Map05() {
       });
 
       map.data.addListener("click", function (e: any) {
-        console.log("event", e);
         const feature = e.feature;
+        const targetId = feature.property_CTPRVN_CD;
+        const targetCenter = {
+          x:
+            (feature.bounds._max.x - feature.bounds._min.x) / 2 +
+            feature.bounds._min.x,
+          y:
+            (feature.bounds._max.y - feature.bounds._min.y) / 2 +
+            feature.bounds._min.y,
+        };
+        setSelectedReg(targetId);
+        handleSelect(targetId, targetCenter);
+        console.log(feature);
 
-        if (feature.getProperty("focus") !== true) {
-          feature.setProperty("focus", true);
-        } else {
-          feature.setProperty("focus", false);
-        }
+        map.data.forEach((region: any) => {
+          if (region.property_CTPRVN_CD === targetId) {
+            if (feature.getProperty("focus") !== true) {
+              feature.setProperty("focus", true);
+            } else {
+              feature.setProperty("focus", false);
+            }
+          } else {
+            region.setProperty("focus", false);
+          }
+        });
       });
       map.data.addListener("mouseover", function (e: any) {
         const feature = e.feature;
-        const regionName = feature.getProperty("area1");
-
+        //const regionName = feature.getProperty("area1");
+        // console.log(e.feature);
         // tooltip.css({
         //     display: '',
         //     left: e.offset.x,
@@ -97,7 +118,7 @@ export function Map05() {
 
   return (
     <>
-      <Box w="1200px" h="560px" id="naver_map05"></Box>
+      <Box w="600px" h="560px" id="naver_map05"></Box>
     </>
   );
 }
