@@ -12,13 +12,15 @@ export const Map01 = () => {
   const { map } = useMapState();
   const dispatch = useMapDispatch();
 
-  const [showLayer, setShowLayer] = useState<boolean>(false);
-
   let mapObject: MapProps = null;
   let mapElement: any = null;
-  const marker: MarkerProps = null;
-  const markersArray: MarkerProps[] = null;
-  const newLayer: newLayerProps = new naver.maps.CadastralLayer();
+
+  const totalList: { location: number[]; type?: string; name: string }[] = [
+    ...HospitalList,
+    ...CafeList,
+    ...HotelList,
+  ];
+  //console.log(totalList);
 
   const initMap = () => {
     mapObject = new naver.maps.Map("naver_map", {
@@ -34,6 +36,26 @@ export const Map01 = () => {
   };
 
   const initMarker = () => {
+    // totalList.map((unit) => {
+    //   let imgUrl: string;
+    //   if (unit.type === "cafe")
+    //     return (imgUrl = "../../assets/images/marker_C.png");
+    //   else if (unit.type === "hotel")
+    //     return (imgUrl = "../../assets/images/marker_H.png");
+    //   else if (unit.type === "hospital")
+    //     return (imgUrl = "../../assets/images/marker_H.png");
+    //   console.log(imgUrl);
+
+    //   const mapMarker = new naver.maps.Marker({
+    //     position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
+    //     map: map,
+    //     title: unit.name,
+    //     icon: {
+    //       url: "../../assets/images/marker_H.png",
+    //       anchor: new naver.maps.Point(12, 37),
+    //     },
+    //   });
+    // });
     HotelList.map((unit) => {
       const mapMarker = new naver.maps.Marker({
         position: new naver.maps.LatLng(unit.location[0], unit.location[1]),

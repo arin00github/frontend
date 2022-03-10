@@ -80,11 +80,17 @@ export const Map02 = () => {
         zIndex: 100,
       });
 
+      const contentString =
+        '<div style="width:150px;text-align:center;padding:10px;">The Letter is <b>"' +
+        key.substr(0, 1) +
+        '"</b></div>';
+
       const infoWindow = new naver.maps.InfoWindow({
-        content:
-          '<div style="width:150px;text-align:center;padding:10px;">The Letter is <b>"' +
-          key.substr(0, 1) +
-          '"</b>.</div>',
+        content: contentString,
+        borderWidth: 1,
+        borderColor: "#0475f4",
+        anchorSize: new naver.maps.Size(10, 10),
+        anchorSkew: false,
       });
 
       markers.push(marker);
