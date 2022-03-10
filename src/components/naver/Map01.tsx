@@ -4,6 +4,7 @@ import { useMapDispatch, useMapState } from "./MapProvider01";
 import HotelList from "../../service/data/naver01_hotel.json";
 import CafeList from "Data/naver01_cafe.json";
 import HospitalList from "Data/naver01_hospital.json";
+import TotalList from "Data/naver01.json";
 import { MapProps, MarkerProps } from "./Naver_map";
 
 type newLayerProps = naver.maps.CadastralLayer;
@@ -36,62 +37,53 @@ export const Map01 = () => {
   };
 
   const initMarker = () => {
-    // totalList.map((unit) => {
-    //   let imgUrl: string;
-    //   if (unit.type === "cafe")
-    //     return (imgUrl = "../../assets/images/marker_C.png");
-    //   else if (unit.type === "hotel")
-    //     return (imgUrl = "../../assets/images/marker_H.png");
-    //   else if (unit.type === "hospital")
-    //     return (imgUrl = "../../assets/images/marker_H.png");
-    //   console.log(imgUrl);
+    TotalList.map((unit) => {
+      let imgUrl;
+      if (unit.type === "hotel") {
+        imgUrl = "../../assets/images/marker_H.png";
+      } else if (unit.type === "cafe") {
+        imgUrl = "../../assets/images/marker_C.png";
+      } else if (unit.type === "park") {
+        imgUrl = "../../assets/images/marker_R.png";
+      } else if (unit.type === "hospital") {
+        imgUrl = "../../assets/images/marker_H.png";
+      }
 
+      const mapMarker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
+        map: map,
+        title: unit.name,
+        icon: {
+          url: imgUrl,
+          anchor: new naver.maps.Point(12, 37),
+        },
+      });
+      //return mapMarker;
+    });
+    // CafeList.map((unit) => {
     //   const mapMarker = new naver.maps.Marker({
     //     position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
     //     map: map,
     //     title: unit.name,
     //     icon: {
-    //       url: "../../assets/images/marker_H.png",
+    //       url: "../../assets/images/marker_C.png",
     //       anchor: new naver.maps.Point(12, 37),
     //     },
     //   });
+    //   return mapMarker;
     // });
-    HotelList.map((unit) => {
-      const mapMarker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
-        map: map,
-        title: unit.name,
-        icon: {
-          url: "../../assets/images/marker_H.png",
-          anchor: new naver.maps.Point(12, 37),
-        },
-      });
-      return mapMarker;
-    });
-    CafeList.map((unit) => {
-      const mapMarker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
-        map: map,
-        title: unit.name,
-        icon: {
-          url: "../../assets/images/marker_C.png",
-          anchor: new naver.maps.Point(12, 37),
-        },
-      });
-      return mapMarker;
-    });
-    HospitalList.map((unit) => {
-      const mapMarker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
-        map: map,
-        title: unit.name,
-        icon: {
-          url: "../../assets/images/marker_R.png",
-          anchor: new naver.maps.Point(12, 37),
-        },
-      });
-      return mapMarker;
-    });
+    // HospitalList.map((unit) => {
+    //   const mapMarker = new naver.maps.Marker({
+    //     position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
+    //     map: map,
+    //     title: unit.name,
+    //     icon: {
+    //       url: "../../assets/images/marker_R.png",
+    //       anchor: new naver.maps.Point(12, 37),
+    //     },
+    //   });
+    //   return mapMarker;
+    // });
   };
 
   const myMapType: naver.maps.MapType = {
