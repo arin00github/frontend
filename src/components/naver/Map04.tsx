@@ -4,14 +4,11 @@ import { useMapDispatch, useMapState } from "./MapProvider04";
 import "./map.css";
 
 export function Map04() {
-  const [dataList, setDataList] = useState(null);
-
   const { map } = useMapState();
 
   const dispatch = useMapDispatch();
 
   let mapObject;
-  let miniMap;
   let contentEl: HTMLDivElement;
   let semaphore = false;
   function initMap() {

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { useMapDispatch05, useMapState05 } from "./MapProvider05";
 import regionData from "Data/map.json";
+import { FeatureProps } from "./Naver_map";
 
 interface IMap05 {
   handleSelect: (code: string, center?: any) => void;
 }
 
 export function Map05({ handleSelect }: IMap05) {
-  const [dataList, setDataList] = useState(null);
   const [selectedReg, setSelectedReg] = useState<string>(undefined);
 
   const { map } = useMapState05();
@@ -16,7 +16,6 @@ export function Map05({ handleSelect }: IMap05) {
   const dispatch = useMapDispatch05();
 
   let mapObject;
-  let markerBox;
 
   function initMap() {
     mapObject = new naver.maps.Map("naver_map05", {
@@ -35,7 +34,7 @@ export function Map05({ handleSelect }: IMap05) {
 
   function renderGeojson() {
     naver.maps.Event.once(map, "init", function (e) {
-      map.data.setStyle(function (feature: naver.maps.Feature) {
+      map.data.setStyle(function (feature: FeatureProps) {
         const styleOptions = {
           fillColor: "#ff0000",
           fillOpacity: 0.0001,

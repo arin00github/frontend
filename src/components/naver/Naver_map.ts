@@ -1,0 +1,12 @@
+export type MapProps = naver.maps.Map;
+export type MarkerProps = naver.maps.Marker;
+export type LatLngProps = naver.maps.LatLng;
+export type BoundsProps = naver.maps.Bounds;
+export type DataProps = naver.maps.Data;
+export type FeatureProps = naver.maps.Feature;
+export type LayerProps = naver.maps.Layer;
+export type PointProps = naver.maps.Point;
+export type SizeProps = naver.maps.Size;
+export type CoordProps = naver.maps.Coord;
+export type InfoWindowProps = naver.maps.InfoWindow;
+export type PositionProps = naver.maps.Position;

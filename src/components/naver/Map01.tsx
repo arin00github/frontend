@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button } from "@chakra-ui/react";
 import { useMapDispatch, useMapState } from "./MapProvider01";
-import HotelList from "../../service/data/naver01.json";
+import HotelList from "../../service/data/naver01_hotel.json";
+import CafeList from "Data/naver01_cafe.json";
+import HospitalList from "Data/naver01_hospital.json";
+import { MapProps, MarkerProps } from "./Naver_map";
 
-type MapProps = naver.maps.Map;
-type MarkerProps = naver.maps.Marker;
 type newLayerProps = naver.maps.CadastralLayer;
 
 export const Map01 = () => {
@@ -15,7 +16,7 @@ export const Map01 = () => {
 
   let mapObject: MapProps = null;
   let mapElement: any = null;
-  let marker: MarkerProps = null;
+  const marker: MarkerProps = null;
   const markersArray: MarkerProps[] = null;
   const newLayer: newLayerProps = new naver.maps.CadastralLayer();
 
@@ -33,48 +34,43 @@ export const Map01 = () => {
   };
 
   const initMarker = () => {
-    marker = new naver.maps.Marker({
-      position: map.getCenter(),
-      map: map,
-      title: "click to zoom",
-    });
-
     HotelList.map((unit) => {
       const mapMarker = new naver.maps.Marker({
-        position: {
-          x: unit.location[1],
-          _lng: unit.location[1],
-          y: unit.location[0],
-          _lat: unit.location[0],
-        },
+        position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
         map: map,
         title: unit.name,
+        icon: {
+          url: "../../assets/images/marker_H.png",
+          anchor: new naver.maps.Point(12, 37),
+        },
+      });
+      return mapMarker;
+    });
+    CafeList.map((unit) => {
+      const mapMarker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
+        map: map,
+        title: unit.name,
+        icon: {
+          url: "../../assets/images/marker_C.png",
+          anchor: new naver.maps.Point(12, 37),
+        },
+      });
+      return mapMarker;
+    });
+    HospitalList.map((unit) => {
+      const mapMarker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
+        map: map,
+        title: unit.name,
+        icon: {
+          url: "../../assets/images/marker_R.png",
+          anchor: new naver.maps.Point(12, 37),
+        },
       });
       return mapMarker;
     });
   };
-
-  // const addLayer = () => {
-  //   naver.maps.Event.once(map, "init", function () {
-  //     newLayer.setMap(map);
-  //   });
-  // };
-
-  // const toggleLayer = (e: any) => {
-  //   e.preventDefault();
-
-  //   if (newLayer.getMap()) {
-  //     newLayer.setMap(null);
-  //   } else {
-  //     newLayer.setMap(map);
-  //   }
-  // };
-
-  // const pointerClick = () => {
-  //   naver.maps.Event.addListener(map, "click", function (e) {
-  //     marker.setPosition(e.latlng);
-  //   });
-  // };
 
   const myMapType: naver.maps.MapType = {
     name: "Alphabet",
@@ -113,11 +109,8 @@ export const Map01 = () => {
 
   useEffect(() => {
     if (map !== null) {
-      // console.log("useEffect");
       initMarker();
       registerMapType();
-      //addLayer();
-      //pointerClick();
     }
     return () => {
       //
@@ -131,10 +124,6 @@ export const Map01 = () => {
       h="560px"
       w="1200px"
       //  onClick={() => eventListner()}
-    >
-      {/* <Button onClick={toggleLayer} zIndex={1000}>
-        {showLayer ? "지적도 끄기" : "지적도 켜기"}
-      </Button> */}
-    </Box>
+    ></Box>
   );
 };

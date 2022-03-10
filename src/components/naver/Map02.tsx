@@ -1,22 +1,21 @@
 import React, { useEffect } from "react";
 import { Box } from "@chakra-ui/react";
 import { useMapState, useMapDispatch } from "./MapProvider02";
-
-type MapProps = naver.maps.Map;
-type MarkerProps = naver.maps.Marker;
-type newLayerProps = naver.maps.CadastralLayer;
+import {
+  MapProps,
+  MarkerProps,
+  InfoWindowProps,
+  PositionProps,
+} from "./Naver_map";
 
 export const Map02 = () => {
   const { map } = useMapState();
 
   const dispatch = useMapDispatch();
 
-  //let HOME_PATH = window.HOME_PATH || '.';
-  const MARKER_ICON_URL = "/img/marker.png";
   const MARKER_SPRITE_X_OFFSET = 29,
     MARKER_SPRITE_Y_OFFSET = 50;
   const MARKER_SPRITE_POSITION: any = {
-    // A0: [0, 0],
     B0: [MARKER_SPRITE_X_OFFSET, 0],
     C0: [MARKER_SPRITE_X_OFFSET * 2, 0],
     D0: [MARKER_SPRITE_X_OFFSET * 3, 0],
@@ -48,26 +47,18 @@ export const Map02 = () => {
   };
 
   let mapObject: MapProps;
-  const markers: any[] = [];
-  const infoWindows: any[] = [];
-  const initMap = () => {
+  const markers: MarkerProps[] = [];
+  const infoWindows: InfoWindowProps[] = [];
+  function initMap() {
     mapObject = new naver.maps.Map("naver_map02", {
       center: new naver.maps.LatLng(37.3595704, 127.105399),
       zoom: 11,
     });
 
     dispatch({ type: "CHANGE_MAP", map: mapObject });
-  };
+  }
 
-  //let bounds = mapObject.getBounds();
-  //let southWest = bounds
-
-  const makeOrigin = (key: string) => {
-    return [MARKER_SPRITE_POSITION[key][0], MARKER_SPRITE_POSITION[key][1]];
-  };
-
-  const displayData = () => {
-    //console.log("map", map);
+  function displayData() {
     const bounds = map.getBounds();
     const latSpan = bounds.getMax().x - bounds.getMin().x;
     const lngSpan = bounds.getMax().y - bounds.getMin().y;
@@ -78,18 +69,13 @@ export const Map02 = () => {
         bounds.getMin().x + latSpan * Math.random()
       );
 
-      const originValue = makeOrigin(key);
-      //console.log(originValue);
-
       const marker = new naver.maps.Marker({
         map: map,
         position: position,
         title: key,
         icon: {
           url: "../../assets/images/marker.png",
-          //size: new naver.maps.Size(24, 37),
           anchor: new naver.maps.Point(12, 37),
-          //origin: new naver.maps.Point(originValue[0], originValue[1]),
         },
         zIndex: 100,
       });
@@ -104,55 +90,6 @@ export const Map02 = () => {
       markers.push(marker);
       infoWindows.push(infoWindow);
     }
-  };
-
-  const controlMarker = () => {
-    naver.maps.Event.addListener(map, "idle", function () {
-      //console.log("update");
-
-      updateMarker(map, markers);
-    });
-  };
-
-  function updateMarker(mapUnit: MapProps, markersArray: MarkerProps[]) {
-    const mapBounds = mapUnit.getBounds();
-
-    // const sw = new naver.maps.LatLng(
-    //   mapBounds.getMin().y,
-    //   mapBounds.getMin().x
-    // );
-    // const ne = new naver.maps.LatLng(
-    //   mapBounds.getMax().y,
-    //   mapBounds.getMax().x
-    // );
-
-    let markerUnit, position;
-
-    for (let i = 0; i < markersArray.length; i++) {
-      markerUnit = markersArray[i];
-      position = markerUnit.getPosition();
-
-      if (mapBounds.hasPoint(position)) {
-        showMarker(mapUnit, markerUnit);
-      } else {
-        hideMarker(mapUnit, markerUnit);
-      }
-    }
-    const filterPoints = markersArray.filter((point) => {
-      const dotPosition = point.getPosition();
-      return mapBounds.hasPoint(dotPosition);
-    });
-    //console.log(filterPoints.length);
-  }
-
-  function showMarker(mapUnit: MapProps, marker: MarkerProps) {
-    if (marker.getMap()) return;
-    marker.setMap(mapUnit);
-  }
-
-  function hideMarker(mapUnit: MapProps, marker: MarkerProps) {
-    if (!marker.getMap()) return;
-    marker.setMap(null);
   }
 
   function getClickHandler(seq: number) {
@@ -174,15 +111,45 @@ export const Map02 = () => {
     }
   }
 
+  function updateMarker(mapUnit: MapProps, markersArray: MarkerProps[]) {
+    const mapBounds = mapUnit.getBounds();
+    let markerUnit: MarkerProps, position;
+
+    for (let i = 0; i < markersArray.length; i++) {
+      markerUnit = markersArray[i];
+      position = markerUnit.getPosition();
+
+      if (mapBounds.hasPoint(position)) {
+        showMarker(mapUnit, markerUnit);
+      } else {
+        hideMarker(mapUnit, markerUnit);
+      }
+    }
+  }
+
+  function showMarker(mapUnit: MapProps, marker: MarkerProps) {
+    if (marker.getMap()) return;
+    marker.setMap(mapUnit);
+  }
+
+  function hideMarker(mapUnit: MapProps, marker: MarkerProps) {
+    if (!marker.getMap()) return;
+    marker.setMap(null);
+  }
+
+  function controlMarker() {
+    naver.maps.Event.addListener(map, "idle", function () {
+      updateMarker(map, markers);
+    });
+  }
+
   useEffect(() => {
     initMap();
-    console.log();
   }, []);
 
   useEffect(() => {
     if (map !== null) {
       displayData();
-      //console.log("markers", markers);
       controlMarker();
       regitserEvent();
     }
