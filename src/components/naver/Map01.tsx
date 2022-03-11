@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Stack, HStack } from "@chakra-ui/react";
 import { useMapDispatch, useMapState } from "./MapProvider01";
 import HotelList from "../../service/data/naver01_hotel.json";
 import CafeList from "Data/naver01_cafe.json";
@@ -10,17 +10,15 @@ import { MapProps, MarkerProps } from "./Naver_map";
 type newLayerProps = naver.maps.CadastralLayer;
 
 export const Map01 = () => {
+  const [markerList, setMarkerList] = useState<MarkerProps[]>(null);
+  const [dataList, setDataList] = useState(null);
+
   const { map } = useMapState();
   const dispatch = useMapDispatch();
 
   let mapObject: MapProps = null;
   let mapElement: any = null;
 
-  const totalList: { location: number[]; type?: string; name: string }[] = [
-    ...HospitalList,
-    ...CafeList,
-    ...HotelList,
-  ];
   //console.log(totalList);
 
   const initMap = () => {
@@ -36,8 +34,8 @@ export const Map01 = () => {
     dispatch({ type: "CHANGE_MAP", map: mapObject });
   };
 
-  const initMarker = () => {
-    TotalList.map((unit) => {
+  const initMarker = (arrayList: any[]) => {
+    const newArray = arrayList.map((unit) => {
       let imgUrl;
       if (unit.type === "hotel") {
         imgUrl = "../../assets/images/marker_H.png";
@@ -58,32 +56,10 @@ export const Map01 = () => {
           anchor: new naver.maps.Point(12, 37),
         },
       });
-      //return mapMarker;
+      return mapMarker;
     });
-    // CafeList.map((unit) => {
-    //   const mapMarker = new naver.maps.Marker({
-    //     position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
-    //     map: map,
-    //     title: unit.name,
-    //     icon: {
-    //       url: "../../assets/images/marker_C.png",
-    //       anchor: new naver.maps.Point(12, 37),
-    //     },
-    //   });
-    //   return mapMarker;
-    // });
-    // HospitalList.map((unit) => {
-    //   const mapMarker = new naver.maps.Marker({
-    //     position: new naver.maps.LatLng(unit.location[0], unit.location[1]),
-    //     map: map,
-    //     title: unit.name,
-    //     icon: {
-    //       url: "../../assets/images/marker_R.png",
-    //       anchor: new naver.maps.Point(12, 37),
-    //     },
-    //   });
-    //   return mapMarker;
-    // });
+    //console.log(newArray);
+    setMarkerList(newArray);
   };
 
   const myMapType: naver.maps.MapType = {
@@ -119,25 +95,77 @@ export const Map01 = () => {
 
   useEffect(() => {
     initMap();
+    setDataList(TotalList);
   }, []);
 
   useEffect(() => {
     if (map !== null) {
-      initMarker();
+      initMarker(dataList);
       registerMapType();
     }
     return () => {
       //
     };
-  }, [map]);
+  }, [map, dataList]);
 
   return (
-    <Box
-      id="naver_map"
-      //w="100%"
-      h="560px"
-      w="1200px"
-      //  onClick={() => eventListner()}
-    ></Box>
+    <>
+      <HStack spacing={3}>
+        <Button
+          size="sm"
+          onClick={() => {
+            markerList.forEach((unit) => {
+              unit.setMap(null);
+            });
+            const newArray = TotalList.filter((unit) => unit.type === "hotel");
+            setDataList(newArray);
+          }}
+        >
+          H marker
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => {
+            markerList.forEach((unit) => {
+              unit.setMap(null);
+            });
+            const newArray = TotalList.filter((unit) => unit.type === "park");
+            setDataList(newArray);
+          }}
+        >
+          R marker
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => {
+            markerList.forEach((unit) => {
+              unit.setMap(null);
+            });
+            const newArray = TotalList.filter((unit) => unit.type === "cafe");
+            setDataList(newArray);
+          }}
+        >
+          C marker
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => {
+            markerList.forEach((unit) => {
+              unit.setMap(null);
+            });
+            setDataList(TotalList);
+          }}
+        >
+          전체
+        </Button>
+      </HStack>
+      <Box
+        id="naver_map"
+        //w="100%"
+        h="560px"
+        w="1200px"
+        //  onClick={() => eventListner()}
+      ></Box>
+    </>
   );
 };

@@ -7,6 +7,7 @@ import {
   InfoWindowProps,
   PositionProps,
 } from "./Naver_map";
+import $ from "jquery";
 
 export const Map02 = () => {
   const { map } = useMapState();
@@ -158,6 +159,7 @@ export const Map02 = () => {
       displayData();
       controlMarker();
       regitserEvent();
+      //excuteCluster();
     }
   }, [map]);
 

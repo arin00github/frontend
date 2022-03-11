@@ -67,7 +67,7 @@ export function Map05({ handleSelect }: IMap05) {
         };
         setSelectedReg(targetId);
         handleSelect(targetId, targetCenter);
-        console.log(feature);
+        //console.log(feature);
 
         map.data.forEach((region: any) => {
           if (region.property_CTPRVN_CD === targetId) {
@@ -83,13 +83,6 @@ export function Map05({ handleSelect }: IMap05) {
       });
       map.data.addListener("mouseover", function (e: any) {
         const feature = e.feature;
-        //const regionName = feature.getProperty("area1");
-        // console.log(e.feature);
-        // tooltip.css({
-        //     display: '',
-        //     left: e.offset.x,
-        //     top: e.offset.y
-        // }).text(regionName);
 
         map.data.overrideStyle(feature, {
           fillOpacity: 0.6,
@@ -99,7 +92,6 @@ export function Map05({ handleSelect }: IMap05) {
       });
 
       map.data.addListener("mouseout", function (e: any) {
-        //tooltip.hide().empty();
         map.data.revertStyle();
       });
     });

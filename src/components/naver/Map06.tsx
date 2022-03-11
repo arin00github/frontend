@@ -111,12 +111,6 @@ export function Map06({ handleSelect, selectedReg }: IMap05) {
         const feature = e.feature;
         const regionName = feature.getProperty("area1");
 
-        // tooltip.css({
-        //     display: '',
-        //     left: e.offset.x,
-        //     top: e.offset.y
-        // }).text(regionName);
-
         map.data.overrideStyle(feature, {
           fillOpacity: 0.6,
           strokeWeight: 4,

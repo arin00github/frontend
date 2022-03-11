@@ -52,7 +52,10 @@ export default function IndexMenu04() {
               <MapBox06
                 selectedReg={selectedReg}
                 handleSelect={(code: string) => {
-                  console.log(code);
+                  // setSelectedReg({
+                  //   code: code,
+                  //   center: center,
+                  // });
                 }}
               />
             </Flex>
