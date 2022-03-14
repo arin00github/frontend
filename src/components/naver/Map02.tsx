@@ -173,7 +173,9 @@ export const Map02 = () => {
 
     marker.setZIndex(100);
   }
+
   let overlapCoverMarker: any = null;
+
   function recognizerEvent() {
     naver.maps.Event.addListener(recognizer, "overlap", function (list) {
       if (overlapCoverMarker) {
@@ -182,7 +184,9 @@ export const Map02 = () => {
       overlapCoverMarker = list[0].marker;
       naver.maps.Event.once(overlapCoverMarker, "mouseout", function () {
         highlightMarker(overlapCoverMarker);
+        console.log("mouseout");
       });
+      console.log("overlap");
     });
     naver.maps.Event.addListener(recognizer, "clickItem", function (e) {
       recognizer.hide();
@@ -193,7 +197,6 @@ export const Map02 = () => {
         overlapCoverMarker = null;
       }
     });
-    console.log(overlapCoverMarker);
   }
 
   function updateMarker(mapUnit: MapProps, markersArray: MarkerProps[]) {
