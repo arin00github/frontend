@@ -12,7 +12,7 @@ interface IOptions {
 }
 
 interface MarkerSetting extends MarkerProps {
-  __intersectListners: any[];
+  __intersectListners?: any[];
 }
 
 interface IMarkerOverlay {
@@ -26,9 +26,15 @@ interface IMarkerOverlay {
 
   Markers: MarkerProps[] | null;
 
-  createMap(opt: IOptions): void;
+  settingOption: IOptions;
 
-  setMap(map: MapProps): MapProps;
+  options: IOptions;
+
+  initRect(map: MapProps): void;
+
+  setOptions(map: MapProps): void;
+
+  setMap(map: MapProps | null): MapProps | null;
 
   getMap(): MapProps;
 
@@ -70,15 +76,23 @@ interface IMarkerOverlay {
 }
 
 class MarkerOverlay implements IMarkerOverlay {
-  constructor(options: IOptions) {
+  constructor(map: MapProps, options: IOptions) {
     this.options = options;
-    //this.map = null;
+    this.Map = map;
+    this.Markers;
+    this._listners;
+    this._overlapInfoEl;
+    this._overlapListEl;
+    this.rectangle;
   }
-  options: IOptions;
+
+  public options;
+
+  public settingOption: IOptions = null;
 
   public Map: MapProps = null;
 
-  public Markers: MarkerProps[] = null;
+  public Markers: MarkerProps[] = [];
 
   public _listners: any[] = [];
   public _overlapInfoEl: any = $(
@@ -89,18 +103,71 @@ class MarkerOverlay implements IMarkerOverlay {
     '<div style="position:absolute;z-index:100;margin:0;padding:0;display:none;"></div>'
   );
 
-  public rectangle = new naver.maps.Rectangle(this.options.highlightRectStyle);
+  public rectangle =
+    this.settingOption !== null
+      ? new naver.maps.Rectangle(this.settingOption.highlightRectStyle)
+      : null;
 
-  createMap(opt: IOptions): void {}
+  initRect(map: MapProps): void {
+    //
+  }
+
+  setOptions(map: MapProps): void {
+    const bounds = map.getBounds();
+    const swValue = new naver.maps.LatLng(bounds.getMin().y, bounds.getMin().x);
+    const neValue = new naver.maps.LatLng(bounds.getMax().y, bounds.getMax().x);
+    const resetting = Object.assign(
+      {
+        tolerance: 5,
+        highlightRect: true,
+        highlightRectStyle: {
+          bounds: new naver.maps.LatLngBounds(swValue, neValue),
+          strokeColor: "#ff0000",
+          strokeOpacity: 1,
+          strokeWeight: 2,
+          strokeStyle: "dot",
+          fillColor: "#ff0000",
+          fillOpacity: 0.5,
+        },
+        intersectNotice: true,
+        intersectNoticeTemplate:
+          '<div style="width:180px;border:solid 1px #333;background-color:#fff;padding:5px;"><em style="font-weight:bold;color:#f00;">{{count}}</em>개의 마커가 있습니다.</div>',
+        intersectList: true,
+        intersectListTemplate:
+          '<div style="width:200px;border:solid 1px #333;background-color:#fff;padding:5px;">' +
+          '<ul style="list-style:none;margin:0;padding:0;">' +
+          "{{#repeat}}" +
+          '<li style="list-style:none;margin:0;padding:0;"><a href="#">{{order}}. {{title}}</a></li>' +
+          "{{/#repeat}}" +
+          "</ul>" +
+          "</div>",
+      },
+      this.options
+    );
+    this.settingOption = resetting;
+  }
 
   add(marker: MarkerSetting): void {
     this._listners = this._listners.concat(this._bindMarkerEvent(marker));
     this.Markers.push(marker);
   }
 
-  setMap(map: MapProps): MapProps {
+  setMap(map: MapProps | null): MapProps | null {
     const oldMap = this.getMap();
+    console.log("setMap", map);
     if (map === oldMap) return;
+
+    this._unbindEvent();
+    this.hide();
+
+    if (map) {
+      this._bindEvent(map);
+      this._overlapInfoEl.appendTo(map.getPanes().floatPane);
+      this._overlapListEl.appendTo(map.getPanes().floatPane);
+      this.setOptions(map);
+    }
+
+    this.Map = map || null;
   }
 
   getMap(): MapProps {
@@ -113,15 +180,16 @@ class MarkerOverlay implements IMarkerOverlay {
       callback(markerArray[i], i, markerArray);
     }
   }
+
   hide(): void {
     this._overlapInfoEl.hide();
     this._overlapListEl.hide();
   }
 
-  remove(marker: naver.maps.Marker): void {
-    this.forEachArray(function (m, i, mr) {
+  remove(marker: MarkerSetting): void {
+    this.forEachArray(function (m: MarkerProps, i: number, mr: MarkerProps[]) {
       if (m === marker) {
-        marker.splice(i, 1);
+        mr.splice(i, 1);
       }
     });
     this._unbindMarkerEvent(marker);
@@ -129,27 +197,31 @@ class MarkerOverlay implements IMarkerOverlay {
 
   _bindEvent(map: naver.maps.Map): void {
     const listners = this._listners;
-    const self = this;
+    //const self = this;
     listners.push(
-      map.addListener("idle", () => {}),
-      map.addListener("click", () => {})
+      naver.maps.Event.addListener(map, "idle", () => this._onIdle),
+      naver.maps.Event.addListener(map, "idle", () => this._onIdle)
     );
   }
-  _unbindEvent(map: naver.maps.Map): void {
+  _unbindEvent(map?: naver.maps.Map): void {
+    console.log("_unbindEvent");
     const mapObject = map || this.getMap();
     naver.maps.Event.removeListener(this._listners);
     this._listners = [];
 
-    this.rectangle.setMap(null);
     this._overlapInfoEl.remove();
     this._overlapListEl.remove();
   }
 
   _bindMarkerEvent(marker: MarkerSetting): any[] {
     marker.__intersectListners = [
-      marker.addListener("mouseover", () => {}),
-      marker.addListener("mouseout", () => {}),
-      marker.addListener("mousedown", () => {}),
+      naver.maps.Event.addListener(marker, "mouseover", (e) => {
+        this._onOver(e);
+      }),
+      naver.maps.Event.addListener(marker, "mouseout", (e) => {
+        this._onOut(e);
+      }),
+      naver.maps.Event.addListener(marker, "mousedown", (e) => this._onDown(e)),
     ];
 
     return marker.__intersectListners;
@@ -165,23 +237,27 @@ class MarkerOverlay implements IMarkerOverlay {
     const proj = map.getProjection();
     const position = marker.getPosition();
     const offset = proj.fromCoordToOffset(position);
-    const tolerance = this.options.tolerance || 3;
+    const tolerance = this.settingOption.tolerance || 3;
     const rectLeftTop = offset.clone().sub(tolerance, tolerance);
     const rectRightBottom = offset.clone().add(tolerance, tolerance);
-
-    return naver.maps.PointBounds.bounds(rectLeftTop, rectRightBottom);
+    const box = naver.maps.PointBounds.bounds(rectLeftTop, rectRightBottom);
+    return box;
   }
 
   getOverlapedMarkers(
     marker: naver.maps.Marker
   ): { marker: MarkerProps; rect: BoundsProps }[] {
+    console.log("getOverlapedMarkers");
     const baseRect = this.getOverlapRect(marker);
     const overlaped = [{ marker: marker, rect: baseRect }];
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
-    this.forEachArray(function (m: MarkerProps) {
-      if (m === marker) return;
-
+    this.forEachArray(function (m: MarkerProps, idx: number) {
+      if (m === marker) {
+        console.log("end");
+        return;
+      }
       const rect = self.getOverlapRect(m);
       if (rect.intersects(baseRect)) {
         overlaped.push({
@@ -195,23 +271,28 @@ class MarkerOverlay implements IMarkerOverlay {
   }
 
   _onOut(e: any): void {
-    this.rectangle.setMap(null);
+    console.log("_onOut");
+    //this.rectangle.setMap(null);
+    this.rectangle = null;
     this._overlapInfoEl.hide();
   }
   _onIdle(): void {
+    console.log("_onIdle");
     this._overlapInfoEl.hide();
     this._overlapListEl.hide();
   }
 
   _onOver(e: any): void {
+    console.log("onOver");
     const marker: MarkerProps = e.overlay;
     const map = this.getMap();
     const proj = map.getProjection();
     const offset = proj.fromCoordToOffset(marker.getPosition());
     const overlaped = this.getOverlapedMarkers(marker);
+    console.log("overlaped", overlaped.length);
 
     if (overlaped.length > 1) {
-      if (this.options.highlightRect) {
+      if (this.settingOption.highlightRect) {
         let bounds: BoundsProps;
         for (let i = 0; i < overlaped.length; i++) {
           if (bounds) {
@@ -223,16 +304,18 @@ class MarkerOverlay implements IMarkerOverlay {
 
         const min = proj.fromOffsetToCoord(bounds.getMin());
         const max = proj.fromOffsetToCoord(bounds.getMax());
+        const minValue = new naver.maps.LatLng(min.y, min.x);
+        const maxValue = new naver.maps.LatLng(max.y, max.x);
 
-        const boundary = new naver.maps.LatLngBounds(min, max);
+        const boundary = new naver.maps.LatLngBounds(minValue, maxValue);
 
         this.rectangle.setBounds(boundary);
       }
 
-      if (this.options.intersectNotice) {
+      if (this.settingOption.intersectNotice) {
         this._overlapInfoEl
           .html(
-            this.options.intersectNoticeTemplate.replace(
+            this.settingOption.intersectNoticeTemplate.replace(
               /\{\{count\}\}/g,
               String(overlaped.length)
             )
@@ -249,16 +332,17 @@ class MarkerOverlay implements IMarkerOverlay {
   }
 
   _renderIntersectList(overlaped: any[], offset: any): void {
-    if (!this.options.intersectList) return;
+    console.log("_renderIntersectList");
+    if (!this.settingOption.intersectList) return;
     const listLayer = this._overlapListEl;
 
     const REPEAT_REGEX = /\{\{#repeat\}\}([\s\S]*)\{\{\/#repeat\}\}/gm;
-    let template = this.options.intersectListTemplate;
+    let template = this.settingOption.intersectListTemplate;
     let itemTemplate = null;
     let itemPlace = null;
     const matches = REPEAT_REGEX.exec(template);
     const uid = this._guid();
-    const self = this;
+    //const self = this;
 
     listLayer.empty();
 
@@ -281,14 +365,23 @@ class MarkerOverlay implements IMarkerOverlay {
 
     const items = [];
     for (let i = 0; i < overlaped.length; i++) {
-      let c = overlaped[i];
+      const c = overlaped[i];
+      console.log("c", c);
       const item = $(
         itemTemplate.replace(/\{\{(\w+)\}\}/g, (match, symbol) => {
           console.log("match", match, symbol);
-          return match;
+          if (symbol === "order") {
+            return i + 1;
+          } else if (c.marker.get(symbol)) {
+            console.log("example01");
+            return c.marker.get(symbol);
+          } else {
+            match;
+          }
         })
       );
-      item.on("click", () => {});
+
+      item.on("click", () => this._onClickItem(c.marker, self));
       items.push(item);
     }
     for (let j = 0; j < items.length; j++) {
@@ -305,7 +398,7 @@ class MarkerOverlay implements IMarkerOverlay {
   _guid(): string {
     const content = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
       .replace(/[xy]/g, function (c) {
-        var r = (Math.random() * 16) | 0,
+        const r = (Math.random() * 16) | 0,
           v = c == "x" ? r : (r & 0x3) | 0x8;
         return v.toString(16);
       })
@@ -314,12 +407,13 @@ class MarkerOverlay implements IMarkerOverlay {
   }
 
   _onDown(e: any): void {
+    console.log("onDown");
     const marker: MarkerProps = e.overlay;
     const map = this.getMap();
     const proj = map.getProjection();
     const offset = proj.fromCoordToOffset(marker.getPosition());
     const overlaped = this.getOverlapedMarkers(marker);
-    const self = this;
+    //const self = this;
 
     naver.maps.Event.resumeDispatch(marker, "click");
 
@@ -327,12 +421,14 @@ class MarkerOverlay implements IMarkerOverlay {
       return;
     }
     naver.maps.Event.stopDispatch(marker, "click");
+    this._renderIntersectList(overlaped, offset);
     this._overlapInfoEl.hide();
 
     naver.maps.Event.trigger(this, "overlap", overlaped);
   }
 
   _onClickItem(marker: naver.maps.Marker, e: any): void {
+    console.log("onClickItem");
     naver.maps.Event.resumeDispatch(marker, "click");
     naver.maps.Event.trigger(this, "clickItem", {
       overlay: marker,

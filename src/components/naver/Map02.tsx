@@ -7,12 +7,15 @@ import {
   InfoWindowProps,
   PositionProps,
 } from "./Naver_map";
+import MarkerOverlay from "./MarkerCluster";
 import $ from "jquery";
 
 export const Map02 = () => {
   const { map } = useMapState();
 
   const dispatch = useMapDispatch();
+  const MARKER_HIGHLIGHT_ICON_URL = "../../assets/images/marker_H.png";
+  const MARKER_ICON_URL = "../../assets/images/marker_C.png";
 
   const MARKER_SPRITE_X_OFFSET = 29,
     MARKER_SPRITE_Y_OFFSET = 50;
@@ -59,6 +62,11 @@ export const Map02 = () => {
     dispatch({ type: "CHANGE_MAP", map: mapObject });
   }
 
+  const recognizer = new MarkerOverlay(mapObject, {
+    highlightRect: false,
+    tolerance: 5,
+  });
+
   function displayData() {
     const bounds = map.getBounds();
     const latSpan = bounds.getMax().x - bounds.getMin().x;
@@ -75,8 +83,18 @@ export const Map02 = () => {
         position: position,
         title: key,
         icon: {
-          url: "../../assets/images/marker.png",
+          url: MARKER_ICON_URL,
+          size: new naver.maps.Size(24, 37),
           anchor: new naver.maps.Point(12, 37),
+        },
+        shape: {
+          coords: [
+            11, 0, 9, 0, 6, 1, 4, 2, 2, 4, 0, 8, 0, 12, 1, 14, 2, 16, 5, 19, 5,
+            20, 6, 23, 8, 26, 9, 30, 9, 34, 13, 34, 13, 30, 14, 26, 16, 23, 17,
+            20, 17, 19, 20, 16, 21, 14, 22, 12, 22, 12, 22, 8, 20, 4, 18, 2, 16,
+            1, 13, 0,
+          ],
+          type: "poly",
         },
         zIndex: 100,
       });
@@ -86,17 +104,34 @@ export const Map02 = () => {
         key.substr(0, 1) +
         '"</b></div>';
 
-      const infoWindow = new naver.maps.InfoWindow({
-        content: contentString,
-        borderWidth: 1,
-        borderColor: "#0475f4",
-        anchorSize: new naver.maps.Size(10, 10),
-        anchorSkew: false,
+      // const infoWindow = new naver.maps.InfoWindow({
+      //   content: contentString,
+      //   borderWidth: 1,
+      //   borderColor: "#0475f4",
+      //   anchorSize: new naver.maps.Size(10, 10),
+      //   anchorSkew: false,
+      // });
+      //infoWindows.push(infoWindow);
+      markers.push(marker);
+
+      naver.maps.Event.addListener(marker, "mouseover", function (e) {
+        highlightMarker(e.overlay);
+      });
+      naver.maps.Event.addListener(marker, "mouseout", function (e) {
+        unhighlightMarker(e.overlay);
+      });
+      naver.maps.Event.addListener(marker, "click", function (e) {
+        const m = e.overlay;
+
+        //alert(m.title);
       });
 
-      markers.push(marker);
-      infoWindows.push(infoWindow);
+      recognizer.add(marker);
     }
+  }
+  //console.log("recognizer", recognizer);
+  function updateOverlay() {
+    recognizer.setMap(map);
   }
 
   function getClickHandler(seq: number) {
@@ -117,9 +152,53 @@ export const Map02 = () => {
       naver.maps.Event.addListener(markers[i], "click", getClickHandler(i));
     }
   }
+  function highlightMarker(marker: MarkerProps) {
+    const icon: any = marker.getIcon();
+
+    if (icon.url !== MARKER_HIGHLIGHT_ICON_URL) {
+      icon.url = MARKER_HIGHLIGHT_ICON_URL;
+      marker.setIcon(icon);
+    }
+
+    marker.setZIndex(1000);
+  }
+
+  function unhighlightMarker(marker: MarkerProps) {
+    const icon: any = marker.getIcon();
+
+    if (icon.url === MARKER_HIGHLIGHT_ICON_URL) {
+      icon.url = MARKER_ICON_URL;
+      marker.setIcon(icon);
+    }
+
+    marker.setZIndex(100);
+  }
+  let overlapCoverMarker: any = null;
+  function recognizerEvent() {
+    naver.maps.Event.addListener(recognizer, "overlap", function (list) {
+      if (overlapCoverMarker) {
+        unhighlightMarker(overlapCoverMarker);
+      }
+      overlapCoverMarker = list[0].marker;
+      naver.maps.Event.once(overlapCoverMarker, "mouseout", function () {
+        highlightMarker(overlapCoverMarker);
+      });
+    });
+    naver.maps.Event.addListener(recognizer, "clickItem", function (e) {
+      recognizer.hide();
+
+      if (overlapCoverMarker) {
+        unhighlightMarker(overlapCoverMarker);
+
+        overlapCoverMarker = null;
+      }
+    });
+    console.log(overlapCoverMarker);
+  }
 
   function updateMarker(mapUnit: MapProps, markersArray: MarkerProps[]) {
     const mapBounds = mapUnit.getBounds();
+    //console.log(mapBounds);
     let markerUnit: MarkerProps, position;
 
     for (let i = 0; i < markersArray.length; i++) {
@@ -156,12 +235,18 @@ export const Map02 = () => {
 
   useEffect(() => {
     if (map !== null) {
-      displayData();
       controlMarker();
       regitserEvent();
+      updateOverlay();
       //excuteCluster();
+
+      if (recognizer !== undefined && recognizer !== null) {
+        console.log("confirm", recognizer);
+        displayData();
+        recognizerEvent();
+      }
     }
-  }, [map]);
+  }, [map, recognizer]);
 
   return (
     <>
