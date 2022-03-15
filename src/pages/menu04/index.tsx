@@ -31,16 +31,24 @@ export default function IndexMenu04() {
       <Heading my={10}>Naver Map API</Heading>
       <Tabs>
         <TabList>
-          <Tab>marker control</Tab>
-          <Tab>geojson data</Tab>
-          <Tab>layer toggle</Tab>
-
-          {/* <Tab>marker cluster</Tab> */}
+          <Tab>marker cluster</Tab>
+          <Tab>marker filter, maptype select</Tab>
+          <Tab>marker intersect</Tab>
           <Tab>ui control</Tab>
+          <Tab>geojson data</Tab>
         </TabList>
         <TabPanels>
           <TabPanel px={0}>
+            <MapBox03 />
+          </TabPanel>
+          <TabPanel px={0}>
+            <MapBox01 />
+          </TabPanel>
+          <TabPanel px={0}>
             <MapBox02 />
+          </TabPanel>
+          <TabPanel px={0}>
+            <MapBox04 />
           </TabPanel>
           <TabPanel px={0}>
             <Flex>
@@ -63,16 +71,6 @@ export default function IndexMenu04() {
                 }}
               />
             </Flex>
-          </TabPanel>
-          <TabPanel px={0}>
-            <MapBox01 />
-          </TabPanel>
-
-          {/* <TabPanel px={0}>
-            <MapBox03 />
-          </TabPanel> */}
-          <TabPanel px={0}>
-            <MapBox04 />
           </TabPanel>
         </TabPanels>
       </Tabs>

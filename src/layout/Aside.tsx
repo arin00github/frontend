@@ -14,7 +14,7 @@ export function Aside() {
     { title: "React Table", url: "/menu01/table01", index: 1 },
     { title: "Context API", url: "/menu02", index: 2 },
     { title: "OpenLayers", url: "/menu03", index: 3 },
-    { title: "menu04", url: "/menu04", index: 4 },
+    { title: "Naver map", url: "/menu04", index: 4 },
   ];
 
   const renderMenu = () => {

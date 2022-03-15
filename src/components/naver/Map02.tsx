@@ -7,7 +7,7 @@ import {
   InfoWindowProps,
   PositionProps,
 } from "./Naver_map";
-import MarkerOverlay from "./MarkerCluster";
+import MarkerOverlay from "./MarkerOverlay";
 import $ from "jquery";
 
 export const Map02 = () => {
@@ -244,7 +244,7 @@ export const Map02 = () => {
       //excuteCluster();
 
       if (recognizer !== undefined && recognizer !== null) {
-        console.log("confirm", recognizer);
+        //console.log("confirm", recognizer);
         displayData();
         recognizerEvent();
       }

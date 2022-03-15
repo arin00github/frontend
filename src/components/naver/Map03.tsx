@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
 
 import { useMapDispatch, useMapState } from "./MapProvider03";
-//import dataArray from "Data/naver03.json";
+import ClusterOverlay from "./MarkerCluster";
+import DataList from "../../service/data/cluster.json";
 
 export function Map03() {
   const [dataList, setDataList] = useState(null);
@@ -13,93 +14,131 @@ export function Map03() {
 
   let mapObject;
   let markerBox;
-  let semaphore = false;
+  const semaphore = false;
 
-  function initMap() {
-    mapObject = new naver.maps.Map("naver_map03", {
-      zoom: 13,
-      minZoom: 6,
-      center: new naver.maps.LatLng(37.5666805, 126.9784147),
-      mapTypeId: naver.maps.MapTypeId.HYBRID,
-      zoomControl: true,
-      zoomControlOptions: {
-        position: naver.maps.Position.TOP_RIGHT,
-      },
-      mapDataControl: false,
-      logoControlOptions: {
-        position: naver.maps.Position.LEFT_BOTTOM,
-      },
-      disableKineticPan: false,
-    });
-    dispatch({ type: "CHANGE_MAP", map: mapObject });
-  }
-
+  // function initMap() {
+  //   mapObject = new naver.maps.Map("naver_map03", {
+  //     zoom: 6,
+  //     //minZoom: 6,
+  //     center: new naver.maps.LatLng(36.2253017, 127.6460516),
+  //     // mapTypeId: naver.maps.MapTypeId.HYBRID,
+  //     // zoomControl: true,
+  //     // zoomControlOptions: {
+  //     //   position: naver.maps.Position.TOP_RIGHT,
+  //     // },
+  //     // mapDataControl: false,
+  //     // logoControlOptions: {
+  //     //   position: naver.maps.Position.LEFT_BOTTOM,
+  //     // },
+  //     // disableKineticPan: false,
+  //   });
+  //   dispatch({ type: "CHANGE_MAP", map: mapObject });
+  // }
+  let markerClustering: ClusterOverlay = null;
   function initOption() {
-    const miniBox = document.getElementById("mini_map");
-    naver.maps.Event.once(map, "init", function () {
-      map.setOptions({
-        mapTypeControl: true,
-        scaleControl: false,
-        logoControl: false,
-      });
+    // naver.maps.Event.once(map, "init", function () {
+    //   map.setOptions({
+    //     mapTypeControl: true,
+    //     scaleControl: false,
+    //     logoControl: false,
+    //   });
+    // });
 
-      //console.log(map.controls[naver.maps.Position.BOTTOM_RIGHT]);
-
-      map.controls[naver.maps.Position.BOTTOM_RIGHT].push(miniBox);
-      map.setOptions({
-        scaleControl: true,
-        logoControl: true,
-      });
-      const minimap = new naver.maps.Map("minimap", {
-        //미니 맵 지도를 생성합니다.
-        bounds: map.getBounds(),
-        scrollWheel: false,
-        scaleControl: false,
-        mapDataControl: false,
-        logoControl: false,
-      });
-
-      naver.maps.Event.addListener(map, "bounds_changed", function (bounds) {
-        if (semaphore) return;
-        minimap.fitBounds(bounds);
-      });
-
-      naver.maps.Event.addListener(
-        map,
-        "mapTypeId_changed",
-        function (mapTypeId: any) {
-          const toTypes: any = {
-            normal: "hybrid",
-            terrain: "satellite",
-            satellite: "terrain",
-            hybrid: "normal",
-          };
-
-          minimap.setMapTypeId(toTypes[mapTypeId]);
-        }
-      );
-
-      naver.maps.Event.addListener(minimap, "drag", function () {
-        semaphore = true;
-        map.panTo(minimap.getCenter(), {
-          easing: "",
-        });
-        naver.maps.Event.once(map, "idle", function () {
-          semaphore = false;
-        });
-      });
+    mapObject = new naver.maps.Map("naver_map03", {
+      zoom: 6,
+      //minZoom: 6,
+      center: new naver.maps.LatLng(36.2253017, 127.6460516),
+      // mapTypeId: naver.maps.MapTypeId.HYBRID,
+      // zoomControl: true,
+      // zoomControlOptions: {
+      //   position: naver.maps.Position.TOP_RIGHT,
+      // },
+      // mapDataControl: false,
+      // logoControlOptions: {
+      //   position: naver.maps.Position.LEFT_BOTTOM,
+      // },
+      // disableKineticPan: false,
     });
+
+    const data = DataList.searchResult.accidentDeath;
+
+    const markers = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const spot = data[i];
+      const latlng = new naver.maps.LatLng(
+        parseInt(spot.grd_la),
+        parseInt(spot.grd_lo)
+      );
+      const marker = new naver.maps.Marker({
+        position: latlng,
+        draggable: true,
+      });
+
+      markers.push(marker);
+    }
+
+    const htmlMarker1 = {
+        content:
+          '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(../../assets/images/cluster-marker-1.png);background-size:contain;"></div>',
+        size: new naver.maps.Size(40, 40),
+        anchor: new naver.maps.Point(20, 20),
+      },
+      htmlMarker2 = {
+        content:
+          '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(../../assets/images/cluster-marker-2.png);background-size:contain;"></div>',
+        size: new naver.maps.Size(40, 40),
+        anchor: new naver.maps.Point(20, 20),
+      },
+      htmlMarker3 = {
+        content:
+          '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(../../assets/images/cluster-marker-3.png);background-size:contain;"></div>',
+        size: new naver.maps.Size(40, 40),
+        anchor: new naver.maps.Point(20, 20),
+      },
+      htmlMarker4 = {
+        content:
+          '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(../../assets/images/cluster-marker-4.png);background-size:contain;"></div>',
+        size: new naver.maps.Size(40, 40),
+        anchor: new naver.maps.Point(20, 20),
+      },
+      htmlMarker5 = {
+        content:
+          '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(../../assets/images/cluster-marker-5.png);background-size:contain;"></div>',
+        size: new naver.maps.Size(40, 40),
+        anchor: new naver.maps.Point(20, 20),
+      };
+
+    markerClustering = new ClusterOverlay({
+      minClusterSize: 2,
+      maxZoom: 10,
+      map: mapObject,
+      markers: markers,
+      disableClickZoom: false,
+      gridSize: 120,
+      icons: [htmlMarker1, htmlMarker2, htmlMarker3, htmlMarker4, htmlMarker5],
+      indexGenerator: [10, 100, 200, 500, 1000],
+      stylingFunction: function (clusterMarker: any, count: any) {
+        $(clusterMarker.getElement()).find("div:first-child").text(count);
+      },
+    });
+    //markerClustering.onAdd();
+    console.log(markerClustering);
   }
+  function execute() {
+    markerClustering.onAdd();
+  }
+
   useEffect(() => {
-    initMap();
+    initOption();
     //setDataList(dataArray.searchResult.accidentDeath);
   }, []);
 
   useEffect(() => {
-    if (map !== null) {
-      initOption();
+    if (markerClustering !== null) {
+      execute();
     }
-  }, [map]);
+  }, [markerClustering]);
 
   return (
     <>
