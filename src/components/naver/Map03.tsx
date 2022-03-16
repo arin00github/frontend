@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
 
 import { useMapDispatch, useMapState } from "./MapProvider03";
-import ClusterOverlay from "./MarkerCluster";
+import ClusterLayer from "./MarkerCluster";
 import DataList from "../../service/data/cluster.json";
 
 export function Map03() {
@@ -16,34 +16,7 @@ export function Map03() {
   let markerBox;
   const semaphore = false;
 
-  // function initMap() {
-  //   mapObject = new naver.maps.Map("naver_map03", {
-  //     zoom: 6,
-  //     //minZoom: 6,
-  //     center: new naver.maps.LatLng(36.2253017, 127.6460516),
-  //     // mapTypeId: naver.maps.MapTypeId.HYBRID,
-  //     // zoomControl: true,
-  //     // zoomControlOptions: {
-  //     //   position: naver.maps.Position.TOP_RIGHT,
-  //     // },
-  //     // mapDataControl: false,
-  //     // logoControlOptions: {
-  //     //   position: naver.maps.Position.LEFT_BOTTOM,
-  //     // },
-  //     // disableKineticPan: false,
-  //   });
-  //   dispatch({ type: "CHANGE_MAP", map: mapObject });
-  // }
-  let markerClustering: ClusterOverlay = null;
-  function initOption() {
-    // naver.maps.Event.once(map, "init", function () {
-    //   map.setOptions({
-    //     mapTypeControl: true,
-    //     scaleControl: false,
-    //     logoControl: false,
-    //   });
-    // });
-
+  function initMap() {
     mapObject = new naver.maps.Map("naver_map03", {
       zoom: 6,
       //minZoom: 6,
@@ -59,7 +32,11 @@ export function Map03() {
       // },
       // disableKineticPan: false,
     });
+    dispatch({ type: "CHANGE_MAP", map: mapObject });
+  }
+  let markerClustering: ClusterLayer = null;
 
+  function initOption() {
     const data = DataList.searchResult.accidentDeath;
 
     const markers = [];
@@ -109,39 +86,49 @@ export function Map03() {
         anchor: new naver.maps.Point(20, 20),
       };
 
-    markerClustering = new ClusterOverlay({
+    markerClustering = new ClusterLayer({
       minClusterSize: 2,
       maxZoom: 10,
-      map: mapObject,
+      map: map,
       markers: markers,
       disableClickZoom: false,
       gridSize: 120,
       icons: [htmlMarker1, htmlMarker2, htmlMarker3, htmlMarker4, htmlMarker5],
       indexGenerator: [10, 100, 200, 500, 1000],
       stylingFunction: function (clusterMarker: any, count: any) {
-        $(clusterMarker.getElement()).find("div:first-child").text(count);
+        //$(clusterMarker.getElement()).find("div:first-child").text(count);
       },
     });
-    //markerClustering.onAdd();
     console.log(markerClustering);
+    //markerClustering.onAdd();
   }
-  function execute() {
-    markerClustering.onAdd();
-  }
+  // function execute() {
+  //   markerClustering.onAdd();
+  // }
 
   useEffect(() => {
-    initOption();
+    initMap();
     //setDataList(dataArray.searchResult.accidentDeath);
   }, []);
 
   useEffect(() => {
-    if (markerClustering !== null) {
-      execute();
+    if (map !== null) {
+      console.log("useEffect2");
+      initOption();
     }
-  }, [markerClustering]);
+  }, [map]);
 
   return (
     <>
+      {/* <div style={{background:url(../../assets/images/cluster-marker-5.png);background-size:contain;}}></div> */}
+      <div
+        style={{
+          background: "url(../../assets/images/cluster-marker-5.png)",
+          backgroundSize: "contain",
+          width: "40px",
+          height: "40px",
+        }}
+      ></div>
       <Box w="1400px" h="680px" id="naver_map03" pos="relative">
         <Box
           id="mini_map"

@@ -6,97 +6,19 @@ import {
   LatLngProps,
   PointProps,
 } from "./Naver_map";
+import $ from "jquery";
 
 interface IOption {
   map: MapProps | null;
   markers: MarkerProps[] | null;
-  disableClickZoom: boolean;
-  minClusterSize: number;
-  maxZoom: number;
-  gridSize: number;
-  icons: any[];
-  indexGenerator: number[];
-  averageCenter: boolean;
-  stylingFunction: () => void;
-}
-
-interface IClusterOverlay {
-  _options: naver.maps.KVO;
-
-  //KVOobject: naver.maps.KVO | object;
-  DEFAULT_OPTIONS: IOption;
-  _clusters: any[];
-
-  _mapRelations: naver.maps.MapEventListener;
-  _markerRelatioins: any[];
-
-  mapObject: MapProps;
-
-  onAdd(): void;
-
-  draw(): void;
-
-  onRemove(): void;
-
-  getMap(): MapProps;
-
-  setMap(map: MapProps): void;
-
-  setOptions(newOptions: object | string): void;
-
-  getOptions(key: string): any;
-
-  getMinClusterSize(): any;
-
-  setMinClusterSize(size: number): void;
-
-  getMaxZoom(): number;
-
-  setMaxZoom(zoom: number): void;
-
-  getGridSize(): number;
-
-  setGridSize(size: number): void;
-
-  getIndexGenerator(): number[];
-
-  setIndexGenerator(indexGenerator: any): void;
-
-  getMarkers(): MarkerProps[];
-
-  setMarkers(markers: MarkerProps[]): void;
-
-  getIcons(): any;
-
-  setIcons(icons: any): void;
-
-  getStylingFunction(): void | any;
-
-  setStylingFunction(func: () => void | any): void;
-
-  getDisableClickZoom(): boolean;
-
-  setDisableClickZoom(flag: boolean): void;
-
-  getAverageCenter(): boolean;
-
-  setAverageCenter(averageCenter: boolean): void;
-
-  changed(key: string, value: any): void;
-
-  _createClusters(): void;
-
-  _updateClusters(): void;
-
-  _clearCluster(): void;
-
-  _redraw(): void;
-
-  _getClosestCluster(position: LatLngProps): Cluster;
-
-  _onIdle(): void;
-
-  _onDragEng(): void;
+  disableClickZoom?: boolean;
+  minClusterSize?: number;
+  maxZoom?: number;
+  gridSize?: number;
+  icons?: any[];
+  indexGenerator?: number[];
+  averageCenter?: boolean;
+  stylingFunction?: (clusterMarker: any, count: any) => void;
 }
 
 interface ICluster {
@@ -104,8 +26,8 @@ interface ICluster {
   _clusterBounds: naver.maps.LatLngBounds;
   _clusterMarker: MarkerProps;
   _relation: any;
-  _clusterMember: any[];
-  _markerClusterer: IClusterOverlay;
+  _clusterMember: naver.maps.Marker[];
+  _markerClusterer: ClusterLayer;
 
   addMarker(marker: MarkerProps): void;
 
@@ -129,19 +51,51 @@ interface ICluster {
   _calcAverageCenter(markers: MarkerProps[]): PointProps;
 }
 
-//const ClusterLayer = new naver.maps.KVO();
+interface IClusterLayer {
+  _clusters: ICluster[];
+  _mapRelations: any;
+  _markerRelations: any[];
+  _options: naver.maps.KVO;
+  _clearCluster(): void;
+  _createClusters(): void;
+  _updateClusters(): void;
+  getOptions(key: string): any;
+  setOptions(newOptions: string | IOption | any, value?: any): void;
+  _getClosestCluster(position: naver.maps.Coord): ICluster;
+  changed(key: string, value: any): void;
+  getMinClusterSize(): number;
+  setMinClusterSize(size: number): void;
+  getMaxZoom(): number;
+  setMaxZoom(size: number): void;
+  getGridSize(): number;
+  setGridSize(size: number): void;
+  getIcons(): any[];
+  setIcons(icons: any[]): void;
+  getStylingFunction(): any;
+  setStylingFunction(func: () => any): void;
+  getDisableClickZoom(): boolean;
+  setDisableClickZoom(flag: boolean): void;
+  getMarkers(): naver.maps.Marker[];
+  setMarkers(markers: naver.maps.Marker[]): void;
+  getAverageCenter(): boolean;
+  setAverageCenter(averageCenter: boolean): void;
+  _onIdle(): void;
+  _redraw(): void;
+  _onDragEng(): void;
+}
 
-class ClusterOverlay implements IClusterOverlay {
-  constructor(newOptions: any) {
-    //this._options = newOptions;
-    this.setOptions(newOptions);
-    this.setMap(newOptions.map);
+class ClusterLayer extends naver.maps.OverlayView implements IClusterLayer {
+  public _options: naver.maps.KVO = new naver.maps.KVO();
+
+  constructor(options: IOption) {
+    super();
+    //this._options = options;
+    this.setOptions(options);
+    //this.setMap(options.map);
     this._clusters;
     this._mapRelations;
-    this._markerRelatioins;
+    this._markerRelations;
   }
-
-  //public KVOobject: object | naver.maps.KVO;
 
   public DEFAULT_OPTIONS: IOption = {
     // 클러스터 마커를 올릴 지도입니다.
@@ -168,25 +122,26 @@ class ClusterOverlay implements IClusterOverlay {
     },
   };
 
-  public mapObject: naver.maps.Map = null;
-
-  _options: naver.maps.KVO = new naver.maps.KVO();
-
   public _clusters: ICluster[] = [];
 
-  public _mapRelations: naver.maps.MapEventListener = null;
+  public _mapRelations: any = null;
 
-  public _markerRelatioins: any[] = [];
+  public _markerRelations: any[] = [];
 
-  //initOption(newOptions: object): void {}
-
-  onAdd(): void {
-    console.log("add");
+  onAdd() {
     const map = this.getMap();
-    this._mapRelations = naver.maps.Event.addListener(map, "idle", (event) => {
-      console.log(event);
-      //this._onIdle();
-    });
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+
+    this._mapRelations = naver.maps.Event.addListener(
+      map,
+      "idle",
+      function (event: any) {
+        console.log("event", self);
+        //console.log("event", this); // null
+        self._onIdle();
+      }
+    );
 
     if (this.getMarkers().length > 0) {
       this._createClusters();
@@ -194,54 +149,43 @@ class ClusterOverlay implements IClusterOverlay {
     }
   }
 
-  onRemove(): void {
+  draw(): void {
+    const map = this.getMap();
+
+    if (!this.getMap()) {
+      return;
+    } else {
+      console.log("draw");
+    }
+  }
+
+  onRemove() {
     naver.maps.Event.removeListener(this._mapRelations);
     this._clearCluster();
     this._mapRelations = null;
   }
 
-  draw(): void {
-    console.log("draw");
-  }
-
-  getMap(): naver.maps.Map {
-    console.log("getMap");
-    const map = this._options.get("map");
-    this.mapObject = map;
-    return map;
-  }
-
-  setMap(map: naver.maps.Map): void {
-    console.log("setMap");
-    this._options.set("map", map);
-    this.mapObject = map;
-  }
-
-  getOptions(key: string) {
+  getOptions(key: string): any {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _this = this;
     const options: any = {};
-    naver.maps.OverlayView;
     if (key !== undefined) {
       return _this._options.get(key);
     } else {
       Object.keys(_this.DEFAULT_OPTIONS).forEach(
         (value: string, idx: number) => {
-          options[value] = _this._options.get(value);
+          options[value] = _this.get(value);
         }
       );
-
       return options;
     }
   }
 
-  setOptions(newOptions: string | object | any, value?: any): void {
+  setOptions(newOptions: string | IOption | any, value?: any): void {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const _this = this;
     if (typeof newOptions === "string") {
       const key = newOptions;
-      //const value = arguments[1];
-
       _this._options.set(key, value);
     } else {
       const isFirst = value;
@@ -257,7 +201,7 @@ class ClusterOverlay implements IClusterOverlay {
     }
   }
 
-  getMinClusterSize() {
+  getMinClusterSize(): number {
     return this.getOptions("minClusterSize");
   }
 
@@ -297,15 +241,15 @@ class ClusterOverlay implements IClusterOverlay {
     this.setOptions("markers", markers);
   }
 
-  getIcons() {
+  getIcons(): any[] {
     return this.getOptions("icons");
   }
 
-  setIcons(icons: any): void {
+  setIcons(icons: any[]): void {
     this.setOptions("icons", icons);
   }
 
-  getStylingFunction() {
+  getStylingFunction(): any {
     return this.getOptions("stylingFunction");
   }
 
@@ -374,7 +318,9 @@ class ClusterOverlay implements IClusterOverlay {
 
   _createClusters(): void {
     const map = this.getMap();
-    if (!map) return;
+    if (!map) {
+      return null;
+    }
 
     const bounds = map.getBounds();
     const markers = this.getMarkers();
@@ -388,7 +334,7 @@ class ClusterOverlay implements IClusterOverlay {
       const closestCluster = this._getClosestCluster(position);
       closestCluster.addMarker(marker);
 
-      this._markerRelatioins.push(
+      this._markerRelations.push(
         naver.maps.Event.addListener(marker, "dragend", () => {
           this._onDragEng();
         })
@@ -403,13 +349,12 @@ class ClusterOverlay implements IClusterOverlay {
       clusters[i].destroy();
     }
 
-    naver.maps.Event.removeListener(this._markerRelatioins);
+    naver.maps.Event.removeListener(this._markerRelations);
 
-    this._markerRelatioins = [];
+    this._markerRelations = [];
     this._clusters = [];
   }
   _redraw(): void {
-    console.log("redraw");
     this._clearCluster();
     this._createClusters();
     this._updateClusters();
@@ -427,12 +372,11 @@ class ClusterOverlay implements IClusterOverlay {
   }
 
   _onIdle(): void {
-    console.log("onIdle");
     this._redraw();
   }
 
   _getClosestCluster(position: naver.maps.Coord): ICluster {
-    const proj = this.mapObject.getProjection();
+    const proj = this.getProjection();
     const clusters = this._clusters;
     let closestCluster: ICluster = null;
     let distance = Infinity;
@@ -461,7 +405,7 @@ class ClusterOverlay implements IClusterOverlay {
 }
 
 class Cluster implements ICluster {
-  constructor(markerClusterer: IClusterOverlay) {
+  constructor(markerClusterer: ClusterLayer) {
     this._markerClusterer = markerClusterer;
     this._clusterCenter;
     this._clusterBounds;
@@ -470,7 +414,7 @@ class Cluster implements ICluster {
     this._relation;
   }
 
-  public _markerClusterer: IClusterOverlay;
+  public _markerClusterer: ClusterLayer;
 
   public _clusterCenter: null | naver.maps.Coord = null;
 
@@ -480,16 +424,16 @@ class Cluster implements ICluster {
 
   public _relation: any = null;
 
-  public _clusterMember: any[] = [];
+  public _clusterMember: naver.maps.Marker[] = [];
 
   addMarker(marker: naver.maps.Marker): void {
-    if (this._isMember(marker)) return;
+    if (this._isMember(marker)) {
+      return;
+    }
 
     if (!this._clusterCenter) {
       const position = marker.getPosition();
-
       this._clusterCenter = position;
-
       this._clusterBounds = this._calcBounds(position);
     }
 
@@ -541,8 +485,8 @@ class Cluster implements ICluster {
     this._relation = naver.maps.Event.addListener(
       this._clusterMarker,
       "click",
-      () => {
-        console.log("event");
+      (e) => {
+        map.morph(e.coord, map.getZoom() + 1);
       }
     );
     //
@@ -550,15 +494,31 @@ class Cluster implements ICluster {
 
   disableClickZoom(): void {
     if (!this._relation) return;
-    //naver.maps.Event.removeListener(this._relation);
+    naver.maps.Event.removeListener(this._relation);
     this._relation = null;
   }
 
   updateCluster(): void {
     if (!this._clusterMarker) {
       let position;
-      // if(this._markerClusterer)
+      if (this._markerClusterer.getAverageCenter()) {
+        position = this._calcAverageCenter(this._clusterMember);
+      } else {
+        position = this._clusterCenter;
+      }
+
+      this._clusterMarker = new naver.maps.Marker({
+        position: position,
+        map: this._markerClusterer.getMap(),
+      });
+
+      if (!this._markerClusterer.getDisableClickZoom()) {
+        this.enableClickZoom();
+      }
     }
+    this.updateIcon();
+    this.updateCount();
+    this.checkByZoomAndMinClusterSize();
   }
 
   checkByZoomAndMinClusterSize(): void {
@@ -579,9 +539,21 @@ class Cluster implements ICluster {
   }
 
   updateCount(): void {
-    const stylingFunction = this._markerClusterer.getStylingFunction();
+    //const stylingFunction = this._markerClusterer.getStylingFunction();
 
-    stylingFunction && stylingFunction(this._clusterMarker, this.getCount());
+    const iconElement: any = this._clusterMarker.getIcon();
+    const elementString: string = iconElement.content;
+    const count = this.getCount();
+    this._clusterMarker.setIcon({
+      ...iconElement,
+      content: `${elementString.split('">')[0]}">${count}${
+        elementString.split('">')[1]
+      }`,
+    });
+    //$(iconElement.content).find("div:first-child").text(count);
+    //stylingFunction && stylingFunction(this._clusterMarker, this.getCount());
+    //const iconArray = this._markerClusterer.getIcons();
+    //this._clusterMarker.setIcon(iconArray[this.getCount()]);
   }
 
   updateIcon(): void {
@@ -696,4 +668,7 @@ class Cluster implements ICluster {
   }
 }
 
-export default ClusterOverlay;
+export default ClusterLayer;
+
+//FIX naver.maps.OverlayView 클래스를 상속해야 하는 것 같음.
+//draw, onAdd, onRemove 재정의 해야 한다. class로는 안되고, Fucntion으로 대체해야 함.
