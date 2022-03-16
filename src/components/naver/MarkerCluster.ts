@@ -132,6 +132,7 @@ class ClusterLayer extends naver.maps.OverlayView implements IClusterLayer {
     const map = this.getMap();
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
+    //console.log("this", this.getMarkers());
 
     this._mapRelations = naver.maps.Event.addListener(
       map,
@@ -151,6 +152,8 @@ class ClusterLayer extends naver.maps.OverlayView implements IClusterLayer {
 
   draw(): void {
     const map = this.getMap();
+    const currentMaxZoom = this.getMaxZoom();
+    console.log("currentZoom", currentMaxZoom);
 
     if (!this.getMap()) {
       return;
@@ -170,7 +173,7 @@ class ClusterLayer extends naver.maps.OverlayView implements IClusterLayer {
     const _this = this;
     const options: any = {};
     if (key !== undefined) {
-      return _this._options.get(key);
+      return _this.get(key);
     } else {
       Object.keys(_this.DEFAULT_OPTIONS).forEach(
         (value: string, idx: number) => {
@@ -186,12 +189,12 @@ class ClusterLayer extends naver.maps.OverlayView implements IClusterLayer {
     const _this = this;
     if (typeof newOptions === "string") {
       const key = newOptions;
-      _this._options.set(key, value);
+      _this.set(key, value);
     } else {
       const isFirst = value;
       Object.keys(newOptions).forEach((key: string) => {
         if (key !== "map") {
-          _this._options.set(key, newOptions[key]);
+          _this.set(key, newOptions[key]);
         }
       });
 
@@ -214,6 +217,7 @@ class ClusterLayer extends naver.maps.OverlayView implements IClusterLayer {
   }
 
   setMaxZoom(zoom: number): void {
+    this.setMaxZoom(zoom);
     this.setOptions("maxZoom", zoom);
   }
 
@@ -329,7 +333,12 @@ class ClusterLayer extends naver.maps.OverlayView implements IClusterLayer {
       const marker = markers[i];
       const position = marker.getPosition();
 
-      if (!bounds.hasPoint(position)) continue;
+      if (!bounds.hasPoint(position)) {
+        console.log("continue", i);
+        console.log("position", position);
+
+        continue;
+      }
 
       const closestCluster = this._getClosestCluster(position);
       closestCluster.addMarker(marker);
@@ -526,6 +535,7 @@ class Cluster implements ICluster {
     const minClusterSize = clusterer.getMinClusterSize();
     const maxZoom = clusterer.getMaxZoom();
     const currentZoom = clusterer.getMap().getZoom();
+    //console.log(this.getCount(), minClusterSize);
 
     if (this.getCount() < minClusterSize) {
       this._showMember();
@@ -539,8 +549,6 @@ class Cluster implements ICluster {
   }
 
   updateCount(): void {
-    //const stylingFunction = this._markerClusterer.getStylingFunction();
-
     const iconElement: any = this._clusterMarker.getIcon();
     const elementString: string = iconElement.content;
     const count = this.getCount();
@@ -550,10 +558,6 @@ class Cluster implements ICluster {
         elementString.split('">')[1]
       }`,
     });
-    //$(iconElement.content).find("div:first-child").text(count);
-    //stylingFunction && stylingFunction(this._clusterMarker, this.getCount());
-    //const iconArray = this._markerClusterer.getIcons();
-    //this._clusterMarker.setIcon(iconArray[this.getCount()]);
   }
 
   updateIcon(): void {

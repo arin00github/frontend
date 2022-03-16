@@ -44,13 +44,14 @@ export function Map03() {
     for (let i = 0; i < data.length; i++) {
       const spot = data[i];
       const latlng = new naver.maps.LatLng(
-        parseInt(spot.grd_la),
-        parseInt(spot.grd_lo)
+        Number(spot.grd_la),
+        Number(spot.grd_lo)
       );
       const marker = new naver.maps.Marker({
         position: latlng,
         draggable: true,
       });
+      //console.log(marker.getPosition());
 
       markers.push(marker);
     }
@@ -113,22 +114,12 @@ export function Map03() {
 
   useEffect(() => {
     if (map !== null) {
-      console.log("useEffect2");
       initOption();
     }
   }, [map]);
 
   return (
     <>
-      {/* <div style={{background:url(../../assets/images/cluster-marker-5.png);background-size:contain;}}></div> */}
-      <div
-        style={{
-          background: "url(../../assets/images/cluster-marker-5.png)",
-          backgroundSize: "contain",
-          width: "40px",
-          height: "40px",
-        }}
-      ></div>
       <Box w="1400px" h="680px" id="naver_map03" pos="relative">
         <Box
           id="mini_map"
