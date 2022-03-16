@@ -19,7 +19,7 @@ export function Map03() {
   function initMap() {
     mapObject = new naver.maps.Map("naver_map03", {
       zoom: 6,
-      //minZoom: 6,
+      minZoom: 4,
       center: new naver.maps.LatLng(36.2253017, 127.6460516),
       // mapTypeId: naver.maps.MapTypeId.HYBRID,
       // zoomControl: true,
@@ -114,6 +114,7 @@ export function Map03() {
 
   useEffect(() => {
     if (map !== null) {
+      console.log("useEffect2");
       initOption();
     }
   }, [map]);
