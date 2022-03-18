@@ -15,9 +15,9 @@ import { Box, Text } from "@chakra-ui/react";
 import RenderFeature from "ol/render/Feature";
 import { useEffect } from "react";
 import { useState } from "react";
-import MapContext from "./MapContext01";
+import { useMapState } from "./MapProvider01";
 
-export const MapBox = ({ children }: any) => {
+export const Map01 = ({ children }: any) => {
   const [featureInfo, setFeatureInfo] = useState<string>("");
   const [mapObj, setMapObj] = useState<{ map: Map }>({ map: null });
 
@@ -43,7 +43,7 @@ export const MapBox = ({ children }: any) => {
     });
     const map = new Map({
       layers: [vectorLayer],
-      target: "map1",
+      target: "map_cluster_01",
       view: new View({
         center: [0, 0],
         zoom: 1,
@@ -114,5 +114,5 @@ export const MapBox = ({ children }: any) => {
     return () => map.setTarget(null);
   }, []);
 
-  return <MapContext.Provider value={mapObj}>{children}</MapContext.Provider>;
+  return <Box id="map_cluster_01" h="560px" w="100%"></Box>;
 };

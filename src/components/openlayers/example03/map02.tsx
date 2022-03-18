@@ -9,10 +9,15 @@ import VectorSource from "ol/source/Vector";
 import View from "ol/View";
 import { Fill, Stroke, Style, Text } from "ol/style";
 import { fromLonLat } from "ol/proj";
-import MapContext from "./MapContext02";
+import { useMapState } from "./MapProvider02";
+import { useDispatch } from "react-redux";
 
-export function MapBox2({ children }: any) {
-  const [mapObj, setMapObj] = useState<{ map: Map }>({ map: null });
+export function Map02({ children }: any) {
+  const dispatch = useDispatch();
+
+  const { map, value } = useMapState();
+
+  let mapObject;
 
   useEffect(() => {
     const labelStyle = new Style({
@@ -41,12 +46,14 @@ export function MapBox2({ children }: any) {
 
     const styleArray = [countryStyle, labelStyle];
 
+    const usGeoJson = new VectorSource({
+      url: "https://openlayers.org/data/vector/us-states.json",
+      format: new GeoJSON(),
+    });
+
     const vectorLayer = new VectorLayer({
       background: "white",
-      source: new VectorSource({
-        url: "https://openlayers.org/data/vector/us-states.json",
-        format: new GeoJSON(),
-      }),
+      source: usGeoJson,
       style: function (feature) {
         const label = feature.get("name").split(" ").join("\n");
         labelStyle.getText().setText(label);
@@ -55,19 +62,29 @@ export function MapBox2({ children }: any) {
       declutter: true,
     });
 
-    const map = new Map({
+    mapObject = new Map({
       layers: [vectorLayer],
-      target: "map2",
+      target: "map_cluster_02",
       view: new View({
         center: fromLonLat([-100, 38.5]),
         zoom: 4,
       }),
     });
 
-    setMapObj({ map });
+    mapObject.once("click", (event) => {
+      const source = vectorLayer.getSource();
+      //console.log(source);
+      const features = source.getFeatures();
+      features.forEach((feature) => {
+        const type = feature.getGeometry().getType();
+        console.log(type);
+      });
+    });
+
+    dispatch({ type: "CHANGE_MAP", map: mapObject });
 
     //map.addLayer(vectorLayer);
   }, []);
 
-  return <MapContext.Provider value={mapObj}>{children}</MapContext.Provider>;
+  return <Box id="map_cluster_02" h="560px" w="100%"></Box>;
 }

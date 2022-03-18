@@ -1,203 +1,264 @@
 import React, { useEffect, useState } from "react";
 import "ol/ol.css";
+import { useMapDispatch, useMapState } from "./MapProvider03";
+import { useDispatch } from "react-redux";
+import { Box } from "@chakra-ui/react";
 import Map from "ol/Map";
-import Projection from "ol/proj/Projection";
-import TileLayer from "ol/layer/Tile";
-import TileWMS from "ol/source/TileWMS";
+import Feature from "ol/Feature";
+import GeoJSON from "ol/format/GeoJSON";
 import View from "ol/View";
-import { ScaleLine, defaults as defaultControls } from "ol/control";
-import { addCoordinateTransforms, addProjection, transform } from "ol/proj";
-import MapContext from "./MapContext03";
+import {
+  Circle as CircleStyle,
+  Fill,
+  Icon,
+  Stroke,
+  Style,
+  Text,
+} from "ol/style";
+import { Cluster, OSM, Vector as VectorSource, XYZ } from "ol/source";
+import { LineString, Point, Polygon } from "ol/geom";
+import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
+import { fromLonLat } from "ol/proj";
+import Geometry from "ol/geom/Geometry";
+import geoJsonData from "../../../service/data/openlayers/phtovoltaic.json";
 
-export function MapBox3({ children }: any) {
-  const [type, setType] = useState<string>("singleSelect");
+export function Map03({ children }: any) {
+  const dispatch = useDispatch();
 
-  const [mapObj, setMapObj] = useState<{ map3: Map }>({ map3: null });
+  const { map, value } = useMapState();
+
   useEffect(() => {
-    // By default OpenLayers does not know about the EPSG:21781 (Swiss) projection.
-    // So we create a projection instance for EPSG:21781 and pass it to
-    // ol/proj~addProjection to make it available to the library for lookup by its
-    // code.
-    const projection = new Projection({
-      code: "EPSG:21781",
-      extent: [485869.5728, 76443.1884, 837076.5648, 299941.7864],
-      units: "metric",
+    const circleDistanceMultiplier = 1;
+    const circleFootSeparation = 28;
+    const circleStartAngle = Math.PI / 2;
+
+    const convexHullFill = new Fill({
+      color: "rgba(255, 153, 0, 0.4)",
+    });
+    const convexHullStroke = new Stroke({
+      color: "rgba(204, 85, 0, 1)",
+      width: 1.5,
+    });
+    const outerCircleFill = new Fill({
+      color: "rgba(255, 153, 102, 0.3)",
+    });
+    const innerCircleFill = new Fill({
+      color: "rgba(255, 165, 0, 0.7)",
+    });
+    const textFill = new Fill({
+      color: "#fff",
+    });
+    const textStroke = new Stroke({
+      color: "rgba(0, 0, 0, 0.6)",
+      width: 3,
+    });
+    const innerCircle = new CircleStyle({
+      radius: 14,
+      fill: innerCircleFill,
+    });
+    const outerCircle = new CircleStyle({
+      radius: 20,
+      fill: outerCircleFill,
+    });
+    const darkIcon = new Icon({
+      src: "../../assets/images/marker_C.png",
     });
 
-    const extent = [42000, 30000, 900000, 350000];
-    const layers = [
-      new TileLayer({
-        extent: extent,
-        source: new TileWMS({
-          url: "https://wms.geo.admin.ch/",
-          crossOrigin: "anonymous",
-          attributions:
-            '© <a href="https://shop.swisstopo.admin.ch/en/products/maps/national/lk1000"' +
-            'target="_blank">Pixelmap 1:1000000 / geo.admin.ch</a>',
-          params: {
-            LAYERS: "ch.swisstopo.pixelkarte-farbe-pk1000.noscale",
-            FORMAT: "image/jpeg",
-          },
-          serverType: "mapserver",
-        }),
-      }),
-      new TileLayer({
-        extent: extent,
-        source: new TileWMS({
-          url: "https://wms.geo.admin.ch/",
-          crossOrigin: "anonymous",
-          attributions:
-            '© <a href="https://www.hydrodaten.admin.ch/en/notes-on-the-flood-alert-maps.html"' +
-            'target="_blank">Flood Alert / geo.admin.ch</a>',
-          params: { LAYERS: "ch.bafu.hydroweb-warnkarte_national" },
-          serverType: "mapserver",
-        }),
-      }),
-    ];
+    const lightIcon = new Icon({
+      src: "../../assets/images/marker_H.png",
+    });
 
-    const map = new Map({
-      controls: defaultControls().extend([
-        new ScaleLine({
-          units: "metric",
-        }),
-      ]),
-      layers: layers,
-      target: "map4",
+    function clusterMemberStyle(clusterMember: Feature<Geometry>) {
+      return new Style({
+        geometry: clusterMember.getGeometry(),
+        image: clusterMember.get("LEISTUNG") > 5 ? darkIcon : lightIcon,
+      });
+    }
+    let clickFeature: any, clickResolution: number;
+
+    // function clusterCircleStyle(cluster: any, resolution: number) {
+    //   if (cluster != clickFeature || resolution !== clickResolution) {
+    //     return;
+    //   }
+    //   const clusterMembers = cluster.get("features");
+    //   const centerCoordinates = cluster.getGeometry().getCoordinates();
+
+    //   const callback = generatePointCircle(
+    //     clusterMembers.length,
+    //     centerCoordinates,
+    //     resolution
+    //   ).reduce((styles, coordinates, i) => {
+    //     const point = new Point(coordinates);
+    //     const line = new LineString([centerCoordinates, coordinates]);
+    //     styles.unshift(new Style({ geometry: line, stroke: convexHullStroke }));
+    //   });
+    // }
+
+    function generatePointCircle(
+      count: number,
+      clusterCenter: number[],
+      resolution: number
+    ) {
+      const circumfenrence =
+        circleDistanceMultiplier * circleFootSeparation * (2 + count);
+      let legLength = circumfenrence / (Math.PI * 2);
+      const angleStep = (Math.PI * 2) / count;
+      const res = [];
+      let angle: number;
+
+      legLength = Math.max(legLength, 35) * resolution;
+
+      for (let i = 0; i < count; ++i) {
+        angle = circleStartAngle + i * angleStep;
+        res.push([
+          clusterCenter[0] + legLength * Math.cos(angle),
+          clusterCenter[1] + legLength * Math.sin(angle),
+        ]);
+      }
+
+      return res;
+    }
+
+    let hoverFeature: Feature<Geometry>;
+    function clusterHullStyle(cluster: Feature<Geometry>) {
+      console.log("hull", cluster);
+      if (cluster !== hoverFeature) {
+        return;
+      }
+
+      const originFeatures = cluster.get("features");
+      const point = originFeatures.map((feature: any) =>
+        feature.getGeometry().getCoordinates()
+      );
+      const newStyle = new Style({
+        geometry: new Polygon(point),
+        fill: convexHullFill,
+        stroke: convexHullStroke,
+      });
+
+      return newStyle;
+    }
+
+    function clusterStyle(feature: Feature<Geometry>) {
+      console.log("clusterStyle feature", feature);
+      const size = feature.get("features").length;
+
+      const innerCircleStyle = new Style({ image: outerCircle });
+      const outerCircleStyle = new Style({
+        image: innerCircle,
+        text: size.toString(),
+        fill: textFill,
+        stroke: textStroke,
+      });
+
+      if (size > 1) {
+        return [innerCircleStyle, outerCircleStyle];
+      } else {
+        const originalFeature = feature.get("features")[0];
+        return clusterMemberStyle(originalFeature);
+      }
+    }
+
+    const vectorSource = new VectorSource({
+      features: new GeoJSON().readFeatures(geoJsonData),
+      // url: "../../../service/data/openlayers/phtovoltaic.json",
+    });
+
+    const vectorstyle = new Style({
+      fill: new Fill({
+        color: "#eeeeee",
+      }),
+    });
+
+    const clusterSource = new Cluster({
+      attributions:
+        'Data: <a href="https://www.data.gv.at/auftritte/?organisation=stadt-wien">Stadt Wien</a>',
+      distance: 35,
+      source: vectorSource,
+    });
+
+    const clusterHulls = new VectorLayer({
+      source: clusterSource,
+      style: clusterHullStyle,
+    });
+
+    // Layer displaying the clusters and individual features.
+    const clusters = new VectorLayer({
+      source: clusterSource,
+      style: clusterStyle,
+    });
+
+    const raster = new TileLayer({
+      source: new XYZ({
+        // attributions:
+        //   'Base map: <a target="_blank" href="https://basemap.at/">basemap.at</a>',
+        url: "https://maps{1-4}.wien.gv.at/basemap/bmapgrau/normal/google3857/{z}/{y}/{x}.png",
+      }),
+    });
+
+    let mapObject: Map = null;
+
+    const vectorLayer = new VectorLayer({
+      background: "white",
+      source: vectorSource,
+      style: function (feature) {
+        //console.log(feature);
+        //const color = feature.get("COLOR") || "#eeeeee";
+        vectorstyle.setStroke(new Stroke({ color: "black" }));
+        return vectorstyle;
+      },
+      declutter: true,
+    });
+
+    mapObject = new Map({
+      //layers: [raster, clusterHulls, clusters, clusterCircles],
+      layers: [raster, clusters, vectorLayer],
+      target: "map_cluster_03",
       view: new View({
-        projection: projection,
-        center: transform([8.23, 46.86], "EPSG:4326", "EPSG:21781"),
-        extent: extent,
+        center: [0, 0],
         zoom: 2,
+        maxZoom: 19,
+        extent: [
+          ...fromLonLat([16.1793, 48.1124]),
+          ...fromLonLat([16.5559, 48.313]),
+        ],
+        showFullExtent: true,
       }),
     });
 
-    /*
-     * Swiss projection transform functions downloaded from
-     * https://www.swisstopo.admin.ch/en/knowledge-facts/surveying-geodesy/reference-systems/map-projections.html
-     */
-
-    // function WGStoCHy(lat: number, lng: number) {
-    //   // Converts degrees dec to sex
-    //   lat = DECtoSEX(lat);
-    //   lng = DECtoSEX(lng);
-
-    //   // Converts degrees to seconds (sex)
-    //   lat = DEGtoSEC(lat);
-    //   lng = DEGtoSEC(lng);
-
-    //   // Axillary values (% Bern)
-    //   const lat_aux = (lat - 169028.66) / 10000;
-    //   const lng_aux = (lng - 26782.5) / 10000;
-
-    //   // Process Y
-    //   const y =
-    //     600072.37 +
-    //     211455.93 * lng_aux -
-    //     10938.51 * lng_aux * lat_aux -
-    //     0.36 * lng_aux * Math.pow(lat_aux, 2) -
-    //     44.54 * Math.pow(lng_aux, 3);
-
-    //   return y;
+    // function makePolygon (){
+    //   const features = vectorSource.getFeatures();
+    //   features.forEach((feature) => {
+    //     feature.g
+    //   })
     // }
 
-    // function WGStoCHx(lat: number, lng: number) {
-    //   lat = DECtoSEX(lat);
-    //   lng = DECtoSEX(lng);
+    mapObject.on("dblclick", (event) => {
+      console.log("clusters", clusters);
+      const features = vectorSource.getFeatures();
+      // console.log("feature", features);
+      features.forEach((feature: any, idx) => {
+        if (idx === 1) {
+          const extent: any = feature.getGeometry().getCoordinates();
+          console.log("keys", extent);
+          //const coord = [extent[0], extent[1]];
+        }
+      });
+    });
 
-    //   lat = DEGtoSEC(lat);
-    //   lng = DEGtoSEC(lng);
-
-    //   const lat_aux = (lat - 169028.66) / 10000;
-    //   const lng_aux = (lng - 26782.5) / 10000;
-
-    //   const x =
-    //     200147.07 +
-    //     308807.95 * lat_aux +
-    //     3745.25 * Math.pow(lng_aux, 2) +
-    //     76.63 * Math.pow(lat_aux, 2) -
-    //     194.56 * Math.pow(lng_aux, 2) * lat_aux +
-    //     119.79 * Math.pow(lat_aux, 3);
-
-    //   return x;
-    // }
-
-    // function CHtoWGSlat(y: number, x: number) {
-    //   const y_aux = (y - 60000) / 1000000;
-    //   const x_aux = (x - 60000) / 1000000;
-
-    //   let lat =
-    //     16.9023892 +
-    //     3.238272 * x_aux -
-    //     0.270978 * Math.pow(y_aux, 2) -
-    //     0.002528 * Math.pow(x_aux, 2) -
-    //     0.0447 * Math.pow(y_aux, 2) * x_aux -
-    //     0.014 * Math.pow(x_aux, 3);
-
-    //   lat = (lat + 100) / 36;
-    //   return lat;
-    // }
-
-    // function CHtoWGSlng(y: number, x: number) {
-    //   const y_aux = (y - 60000) / 1000000;
-    //   const x_aux = (x - 60000) / 1000000;
-
-    //   let lng =
-    //     2.6779094 +
-    //     4.728982 * y_aux +
-    //     0.791484 * y_aux * x_aux +
-    //     0.1306 * y_aux * Math.pow(x_aux, 2) -
-    //     0.0436 * Math.pow(y_aux, 3);
-
-    //   lng = (lng * 100) / 36;
-    //   return lng;
-    // }
-
-    // function DECtoSEX(angle: any) {
-    //   const deg = parseInt(angle, 10);
-    //   const min = (angle - deg) * 60;
-    //   const sec = ((angle - deg) * 60 - min) * 60;
-
-    //   return deg + min / 100 + sec / 10000;
-    // }
-
-    // function DEGtoSEC(angle: any) {
-    //   const deg = parseInt(angle, 10);
-    //   let min = (angle - deg) * 60;
-    //   let sec = ((angle - deg) * 100 - min) * 100;
-
-    //   const parts = String(angle).split(".");
-    //   if (parts.length == 2 && parts[1].length == 2) {
-    //     min = Number(parts[1]);
-    //     sec = 0;
-    //   }
-
-    //   return sec + min * 60 + deg * 3600;
-    // }
-
-    // addProjection(projection);
-
-    // // We also declare EPSG:21781/EPSG:4326 transform functions. These functions
-    // // are necessary for the ScaleLine control and when calling ol/proj~transform
-    // // for setting the view's initial center (see below).
-    // addCoordinateTransforms(
-    //   "EPSF:4326",
-    //   projection,
-    //   function (coordinate) {
-    //     return [
-    //       WGStoCHy(coordinate[1], coordinate[0]),
-    //       WGStoCHx(coordinate[1], coordinate[0]),
-    //     ];
-    //   },
-    //   function (coordinate) {
-    //     return [
-    //       CHtoWGSlng(coordinate[0], coordinate[1]),
-    //       CHtoWGSlng(coordinate[0], coordinate[1]),
-    //     ];
-    //   }
-    // );
-
-    setMapObj({ map3: map });
+    mapObject.on("pointermove", (event) => {
+      clusters.getFeatures(event.pixel).then((features) => {
+        //console.log("cluster feature", features);
+        if (features[0] !== hoverFeature) {
+          hoverFeature = features[0];
+          clusterHulls.setStyle(clusterHullStyle);
+          const check = hoverFeature && hoverFeature.get("features").length > 1;
+          mapObject.getTargetElement().style.cursor = check ? "pointer" : "";
+        }
+      });
+    });
+    dispatch({ type: "CHANGE_MAP", map: mapObject });
   }, []);
 
-  return <MapContext.Provider value={mapObj}>{children}</MapContext.Provider>;
+  return <Box id="map_cluster_03" h="560px" w="100%"></Box>;
 }
