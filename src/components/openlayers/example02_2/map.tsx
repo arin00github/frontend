@@ -3,7 +3,7 @@ import Map from "ol/Map";
 import View from "ol/View";
 import XYZ from "ol/source/XYZ";
 import TileLayer from "ol/layer/Tile";
-import { VectorLayer } from "./layers";
+import { VectorLayer, VectorLayer2 } from "./layers";
 import "ol/ol.css";
 import { Box } from "@chakra-ui/react";
 import {
@@ -47,6 +47,12 @@ export function MapComponent() {
   useEffect(() => {
     if (map !== null) {
       draw(map);
+      const layerArray = map.getLayers();
+      console.log("layerArray", layerArray);
+      const view = map.getView();
+      console.log(view);
+      const control = map.getControls();
+      console.log("control", control);
     }
   }, [map]);
 
@@ -57,7 +63,12 @@ export function MapComponent() {
         // 만약 mapContext 값이 있으면 Provider 컴포넌트를 렌더링함
         // Provider 컴포넌트 안에 VectorLayer 가 있음
       }
-      {map !== null && <VectorLayer />}
+      {map !== null && (
+        <>
+          <VectorLayer />
+          <VectorLayer2 />
+        </>
+      )}
     </Box>
   );
 }

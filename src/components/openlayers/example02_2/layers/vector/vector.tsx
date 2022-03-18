@@ -49,7 +49,7 @@ function VectorLayerComponent(props: any): any {
     });
 
     featureToAdd.setStyle(style);
-    //source.clear(); //undefined 값만 있던 내용을 제거.
+    source.clear(); //undefined 값만 있던 내용을 제거.
     source.addFeatures([featureToAdd]); //새로 생성한 Feature를 추가
   };
 
