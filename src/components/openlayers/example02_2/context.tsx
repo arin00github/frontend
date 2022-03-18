@@ -5,12 +5,10 @@ import "ol/ol.css";
 
 interface IValue {
   map: Map;
-  value: string;
 }
 // 초기값정의
 const initialValue: IValue = {
   map: null,
-  value: "EPSG:3857",
 };
 
 // 리듀서 정의
@@ -20,7 +18,7 @@ function mapReducer(state: any, action: any) {
       // console.log("action", action);
       return { ...state, value: action.value };
     case "CHANGE_MAP":
-      // console.log("map action", action);
+      console.log("map action", action);
       return { ...state, map: action.map };
     default:
       throw new Error(`Unhandled action type ${action.type}`);
@@ -28,11 +26,11 @@ function mapReducer(state: any, action: any) {
 }
 
 //Context 생성
-const mapStateContext = createContext<IValue>(null);
+export const mapStateContext = createContext<IValue>(null);
 const mapDispatchContext = createContext(null);
 
 //Provider 컴포넌트 제작 및 useReducer 사용
-export const MapProvider03 = ({ children }: any) => {
+export const MapProvider = ({ children }: any) => {
   const [state, dispatch] = useReducer(mapReducer, initialValue);
 
   return (
@@ -44,11 +42,16 @@ export const MapProvider03 = ({ children }: any) => {
   );
 };
 
+export const MapConsumer = ({ children }: any) => {
+  return <mapStateContext.Consumer>{children}</mapStateContext.Consumer>;
+};
+
 // useContext 불러오고 다시 context 리턴
 export function useMapState() {
   const context = useContext(mapStateContext);
+
   if (!context) {
-    throw new Error("Cannot find TodoProvider");
+    throw new Error("Cannot find mapStateContext");
   }
   return context;
 }
@@ -57,7 +60,7 @@ export function useMapDispatch() {
   const context = useContext(mapDispatchContext);
   //console.log("context", context);
   if (!context) {
-    throw new Error("Cannot find TodoProvider");
+    throw new Error("Cannot find mapDispatchContext");
   }
   return context;
 }

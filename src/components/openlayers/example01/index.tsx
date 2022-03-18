@@ -8,7 +8,7 @@ import { useState } from "react";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
 export const MapBox = () => {
-  const { map } = useContext<{ map: OlMap }>(MapContext);
+  const { map } = useContext<{ map: OlMap; onChangeMap: any }>(MapContext);
 
   //const [view, setView] = useState();
   //const [zoom, setZoom] = useState();
@@ -16,9 +16,9 @@ export const MapBox = () => {
   useEffect(() => {
     if (map !== null && map !== undefined) {
       console.log("map", map);
-      const view = map.getView();
+      const zoom = map.getView().getZoom();
 
-      console.log("view", view);
+      console.log("view", zoom);
 
       //const view: any = map.getView();
       //const zoom: any = map.getZoom();

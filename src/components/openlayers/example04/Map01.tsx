@@ -22,6 +22,7 @@ export const Map01 = () => {
   };
 
   function onChangeProjection(projValue: string) {
+    console.log("onChangeProjection");
     const currentView = map.getView();
     const currentProjection = currentView.getProjection();
     const newProjection = getProjection(projValue);
@@ -54,7 +55,7 @@ export const Map01 = () => {
       projection: newProjection,
     });
     map.setView(newView);
-    console.log("change map", map);
+
     dispatch({ type: "CHANGE_MAP", map: map });
   }
 
@@ -79,7 +80,7 @@ export const Map01 = () => {
 
   useEffect(() => {
     if (map !== null) {
-      console.log("update", value);
+      console.log("update", map);
       onChangeProjection(value);
     }
   }, [value, option]);

@@ -12,10 +12,19 @@ type MapProps = {
   children: ReactNode;
 };
 
-const Map = ({ children }: MapProps) => {
-  const [mapObj, setMapObj] = useState<{ map: OlMap }>({ map: null });
+const MapProvider = ({ children }: MapProps) => {
+  const [mapObj, setMapObj] = useState<OlMap>(null);
 
   //const MapContext = createContext<{ map: OlMap }>({ map: null });
+
+  const handleChangeMap = (mapValue: OlMap) => {
+    setMapObj(mapValue);
+  };
+
+  const providerValue = {
+    map: mapObj,
+    onChangeMap: handleChangeMap,
+  };
 
   useEffect(() => {
     const map = new OlMap({
@@ -35,11 +44,13 @@ const Map = ({ children }: MapProps) => {
         zoom: 15,
       }),
     });
-    setMapObj({ map });
+    setMapObj(map);
     return () => map.setTarget(undefined);
   }, []);
 
-  return <MapContext.Provider value={mapObj}>{children}</MapContext.Provider>;
+  return (
+    <MapContext.Provider value={providerValue}>{children}</MapContext.Provider>
+  );
 };
 
-export default Map;
+export default MapProvider;
