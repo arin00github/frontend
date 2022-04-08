@@ -5,6 +5,9 @@ import { MyTable } from "Components/table/MyTable";
 import { Column } from "react-table";
 import { IDateType01 } from "Interface/dataType01";
 import { useEffect } from "react";
+import { CustomTable } from "Components/table/CustomTable";
+import Table01 from "../../components/table/table01_context";
+import Table01_1 from "../../components/table/table02_ref";
 
 export default function Example01() {
   const [selectedId, setSelectedId] = useState<string>("");
@@ -37,7 +40,10 @@ export default function Example01() {
 
   return (
     <div>
-      <MyTable
+      {/* <CustomTable /> */}
+      {/* <Table01 /> */}
+      <Table01_1 />
+      {/* <MyTable
         data={dataCollection}
         columns={columnArray1}
         isSearch
@@ -46,7 +52,7 @@ export default function Example01() {
         handleRowClick={(clicked_row) => {
           setSelectedId(clicked_row);
         }}
-      />
+      /> */}
     </div>
   );
 }

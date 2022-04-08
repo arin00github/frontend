@@ -78,12 +78,12 @@ export const Map01 = () => {
     dispatch({ type: "CHANGE_MAP", map });
   }, []);
 
-  useEffect(() => {
-    if (map !== null) {
-      console.log("update", map);
-      onChangeProjection(value);
-    }
-  }, [value, option]);
+  // useEffect(() => {
+  //   if (map !== null) {
+  //     console.log("update", map);
+  //     onChangeProjection(value);
+  //   }
+  // }, [value, option]);
 
   return (
     <>

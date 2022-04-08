@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useTodoState } from "./TodoContext";
 
@@ -38,6 +38,10 @@ export default function TodoHead() {
     day: "numeric",
   });
   const dayName = today.toLocaleDateString("ko-KR", { weekday: "long" });
+
+  useEffect(() => {
+    console.log("useEffect");
+  }, []);
 
   return (
     <TodoHeadBlock>
