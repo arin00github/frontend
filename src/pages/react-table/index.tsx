@@ -3,12 +3,9 @@ import { Box, Button, HStack, Text } from "@chakra-ui/react";
 import { PageHeader } from "Layout/PageHeader";
 import { PageBody } from "Layout/PageBody";
 
-import { Column } from "react-table";
-import { useMemo } from "react";
-import { IDateType01, IDateType02 } from "../../service/interface/dataType01";
-import Example01 from "Pages/menu01/example01";
-import Example02 from "Pages/menu01/example02";
-import Example03 from "Pages/menu01/example03";
+import Example01 from "Pages/react-table/example01";
+import Example02 from "Pages/react-table/example02";
+import Example03 from "Pages/react-table/example03";
 import { Route, Routes } from "react-router-dom";
 import { Link } from "react-router-dom";
 
