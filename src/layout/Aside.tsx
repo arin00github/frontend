@@ -11,10 +11,10 @@ interface ImenuArray {
 export function Aside() {
   const menuArray: ImenuArray[] = [
     { title: "home", url: "/", index: 0 },
-    { title: "React Table", url: "/menu01/table01", index: 1 },
-    { title: "Context API", url: "/menu02", index: 2 },
-    { title: "OpenLayers", url: "/menu03", index: 3 },
-    { title: "Naver map", url: "/menu04", index: 4 },
+    { title: "React Table", url: "/react-table/table01", index: 1 },
+    { title: "Context API", url: "/context-api", index: 2 },
+    { title: "OpenLayers", url: "/openlayers", index: 3 },
+    { title: "Naver map", url: "/naver-map", index: 4 },
   ];
 
   const renderMenu = () => {
