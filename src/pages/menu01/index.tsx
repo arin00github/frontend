@@ -6,10 +6,9 @@ import { PageBody } from "../../layout/PageBody";
 export default function IndexMenu01() {
   return (
     <>
-      <PageHeader>React Table</PageHeader>
+      <PageHeader>상태관리 라이브러리</PageHeader>
       <PageBody>
-        <Text>react table 사용법</Text>
-        {/* <MyTable data={dataCollection} columns={columnArray1} /> */}
+        <Text>redux와 context 비교</Text>
       </PageBody>
     </>
   );

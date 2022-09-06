@@ -4,6 +4,7 @@
 
 - map-study : 지도 라이브러리 연습
 - state-container: 상태관리 라이브러리 연습
+- firebase : 구글 firebase 기능 공부
 
 ## map-study 내용
 
