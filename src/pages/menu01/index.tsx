@@ -3,7 +3,6 @@ import { Box, Text } from "@chakra-ui/react";
 import { PageHeader } from "../../layout/PageHeader";
 import { PageBody } from "../../layout/PageBody";
 import dataCollection from "../../service/data/data.json";
-import { MyTable } from "../../components/table/MyTable";
 import { Column } from "react-table";
 import { useMemo } from "react";
 import { IDateType01 } from "../../service/interface/dataType01";
