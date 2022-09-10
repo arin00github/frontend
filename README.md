@@ -14,3 +14,4 @@ opeylayer 와 naver지도 라이브러리 연습
 
 redux와 context차이점 연구
 새로운 상태관리 라이브러리 시도
+re-render 시점 테스트
