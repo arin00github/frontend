@@ -6,14 +6,14 @@ export type IAuthValue = {
   state: string;
 };
 
-const initalState: IAuthValue = {
+const initialState: IAuthValue = {
   isLogin: false,
   state: "close",
 };
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: initalState,
+  initialState: initialState,
   reducers: {
     getLogin: (state, action: PayloadAction<boolean>) => ({
       ...state,

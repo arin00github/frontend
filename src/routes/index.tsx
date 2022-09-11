@@ -28,7 +28,7 @@ export default function AppRoutes() {
       <Routes>
         { authLogin ? (
             <Route path="/" element={<Main />}>
-              <Route path="/" element={<IndexHome />} />
+              <Route path="home" element={<IndexHome />} />
               <Route path="menu01" element={<IndexMenu01 />} />
               <Route path="menu02" element={<IndexMenu02 />} />
               <Route path="menu03/*" element={<IndexMenu03 />} />
