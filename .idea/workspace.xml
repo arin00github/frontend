@@ -12,6 +12,13 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -65,6 +72,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "nodejs_package_manager_path": "yarn",
+    "settings.editor.selected.configurable": "editor.preferences.completion",
     "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
@@ -96,7 +104,7 @@
       <updated>1662789031480</updated>
       <workItem from="1662789035057" duration="1543000" />
       <workItem from="1662792197384" duration="3375000" />
-      <workItem from="1662795934430" duration="3270000" />
+      <workItem from="1662795934430" duration="6332000" />
     </task>
     <servers />
   </component>
