@@ -40,5 +40,6 @@
       "pragma": "React",
       "version": "detect"
     }
-  }
+  },
+  "ignorePatterns": [".eslingrc.json"]
 }
