@@ -27,7 +27,7 @@ export const TodoItem = ({ todo, onRemove, onToggle }: ITodoItem) => {
         {text}
       </span>
 
-      <CloseButton onClick={handleRemove}></CloseButton>
+      <Button onClick={handleRemove}>삭제</Button>
     </ListItem>
   );
 };

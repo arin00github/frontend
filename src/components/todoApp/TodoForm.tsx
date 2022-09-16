@@ -1,4 +1,4 @@
-import { Box, Button, Input } from "@chakra-ui/react";
+import { Box, Button, Input, InputGroup } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 
 interface ITodoForm {
@@ -23,11 +23,14 @@ export const TodoForm = ({ onInsert }: ITodoForm) => {
   return (
     <Box>
       <form onSubmit={onSubmit}>
-        <Input
-          onChange={handleChange}
-          value={inputText}
-          placeholder="할 일을 입력하세요"
-        />
+        <InputGroup>
+          <Input
+            onChange={handleChange}
+            value={inputText}
+            placeholder="할 일을 입력하세요"
+          />
+        </InputGroup>
+
         <Button type="submit">등록</Button>
       </form>
     </Box>

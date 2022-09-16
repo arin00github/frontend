@@ -1,27 +1,29 @@
 import React from "react";
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import TodoApp from "../components/todoApp/TodoApp";
+import { customRender } from "../testUtil";
 
 describe("<TodoApp/>", () => {
   it("renders TodoForm and TodoList", () => {
-    const { getByText, getByTestId } = render(<TodoApp />);
-    getByTestId("TodoList");
-    getByText("등록");
+    const utils = customRender(<TodoApp />, {});
+
+    utils.getByTestId("TodoList");
+    utils.getByText("등록");
   });
 
   it("renders default todo lists", () => {
-    const { getByText } = render(<TodoApp />);
-    getByText("TDD 배우기");
+    const utils = customRender(<TodoApp />, {});
+    utils.getByText("TDD 배우기");
   });
 
   it("creates new todo", () => {
-    const { getByPlaceholderText, getByText } = render(<TodoApp />);
-    fireEvent.change(getByPlaceholderText("할 일을 입력하세요"), {
+    const utils = customRender(<TodoApp />, {});
+    fireEvent.change(utils.getByPlaceholderText("할 일을 입력하세요"), {
       target: {
         value: "새 항목 추가하기",
       },
     });
-    fireEvent.click(getByText("등록"));
-    getByText("새 항목 추가하기");
+    fireEvent.click(utils.getByText("등록"));
+    utils.getByText("새 항목 추가하기");
   });
 });
