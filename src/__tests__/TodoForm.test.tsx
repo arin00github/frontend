@@ -1,7 +1,7 @@
 import React from "react";
 import { fireEvent } from "@testing-library/react";
 import { TodoForm } from "../components/todoApp/TodoForm";
-import { customRender } from "../testUtil";
+import { customRender } from "../util/testUtil";
 // jest.mock('@chakra-ui/core', () => {
 //     const module = jest.requireActual('@chakra-ui/core');
 //     return {

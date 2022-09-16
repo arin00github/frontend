@@ -1,7 +1,7 @@
 import React from "react";
 import { fireEvent } from "@testing-library/react";
 import { TodoItem } from "../components/todoApp/TodoItem";
-import { customRender } from "../testUtil";
+import { customRender } from "../util/testUtil";
 import { UnorderedList } from "@chakra-ui/react";
 interface ITodoProps {
   id: number;

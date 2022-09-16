@@ -1,7 +1,7 @@
 import React from "react";
 import { fireEvent } from "@testing-library/react";
 import TodoApp from "../components/todoApp/TodoApp";
-import { customRender } from "../testUtil";
+import { customRender } from "../util/testUtil";
 
 describe("<TodoApp/>", () => {
   it("renders TodoForm and TodoList", () => {

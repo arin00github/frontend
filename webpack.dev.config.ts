@@ -51,6 +51,7 @@ const config: devConfiguration = {
       Api: path.resolve(__dirname, "./src/service/api/"),
       Interface: path.resolve(__dirname, "./src/service/interface/"),
       Utils: path.resolve(__dirname, "./src/service/utils/"),
+      Util: path.resolve(__dirname, "./src/util/"),
       Redux: path.resolve(__dirname, "./src/redux/"),
       Pages: path.resolve(__dirname, "./src/pages/"),
       Data: path.resolve(__dirname, "./src/service/data/"),

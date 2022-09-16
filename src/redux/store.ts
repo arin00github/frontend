@@ -1,22 +1,31 @@
 import { configureStore } from "@reduxjs/toolkit";
 import React from "react";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { combineReducers, Store } from "redux";
+import { combineReducers, PreloadedState, Store } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
 
 import storage from "redux-persist/lib/storage";
 import authReducer from "./auth/auth.slice";
 
-const persistConfig = {
+export const persistConfig = {
   key: "root",
   storage: storage,
 };
 
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   auth: authReducer,
 });
 
 const enhancedReducer = persistReducer(persistConfig, rootReducer);
+
+export function setupStore(preloadedState?: PreloadedState<RootState>) {
+  return configureStore({
+    reducer: enhancedReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({ serializableCheck: false }),
+    preloadedState,
+  });
+}
 
 export const store = configureStore({
   reducer: enhancedReducer,
@@ -26,8 +35,9 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppStore = ReturnType<typeof setupStore>;
+export type AppDispatch = AppStore["dispatch"];
 
-export type AppDispatch = typeof store.getState;
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

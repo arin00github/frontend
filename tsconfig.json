@@ -20,6 +20,8 @@
             "Interface/*":["src/service/interface/*"],
             "Pages/*":["src/pages/*"],
             "Layout/*":["src/layout/*"],
+            "Redux/*":["src/redux/*"],
+            "Util/*":["src/util/*"]
             
         },
         "jsx": "preserve",

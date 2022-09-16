@@ -7,7 +7,7 @@ import TodoApp from "Components/todoApp/TodoApp";
 export default function IndexMenu02() {
   return (
     <>
-      <PageHeader>AutoComplete</PageHeader>
+      <PageHeader>React Test Library</PageHeader>
       <PageBody>
         <Text>
           <TodoApp />
